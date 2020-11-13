@@ -3,7 +3,7 @@ version: '3.7'
 services:
     node:
         image: node:fermium-alpine
-        container_name: uptownpanda-site
+        container_name: uptownpanda.finance
         restart: always
         stdin_open: true
         ports:
