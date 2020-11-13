@@ -1,0 +1,14 @@
+version: '3.7'
+
+services:
+    node:
+        image: node:fermium-alpine
+        container_name: uptownpanda-site
+        restart: always
+        stdin_open: true
+        ports:
+            - 3000:3000
+        volumes:
+            - ./src:/app
+        working_dir: /app
+        command: npm run dev

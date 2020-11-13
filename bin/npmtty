@@ -1,0 +1,2 @@
+#!/bin/bash
+docker run --rm -it -v `pwd`/src:/app -w /app -u `id -u`:`id -g` node:fermium-alpine npm "$@"
