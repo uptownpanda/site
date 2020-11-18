@@ -1,6 +1,0 @@
-#!/bin/bash
-#GIT_COMMIT=`git rev-parse --short HEAD`
-GIT_COMMIT=latest
-IMAGE=docker-registry.kesopeso.eu/uptownpanda.finance:${GIT_COMMIT}
-docker build --force-rm --no-cache -t ${IMAGE} .
-docker push ${IMAGE}

@@ -1,16 +1,24 @@
 import Head from 'next/head';
-// include page styles
 
-const Home = () => {
+const Home: React.FC<{}> = () => {
     return (
         <>
             <Head>
-                <title>Uptown panda</title>
+                <title>Uptown Panda | Home - uptownpanda.finance</title>
             </Head>
 
-            <main>TESTING</main>
-
-            <footer>FOOTER</footer>
+            <div className="container-md py-6">
+                <div className="row">
+                    <div className="col-12">
+                        <img
+                            width="250"
+                            src="/logo-big.png"
+                            className="mx-auto d-block mw-100"
+                            alt="Uptown Panda Logo"
+                        />
+                    </div>
+                </div>
+            </div>
         </>
     );
 };

@@ -1,4 +1,6 @@
 FROM node:fermium-alpine AS build
+ARG nextjs_environment
+ENV NEXTJS_ENVIRONMENT=${nextjs_environment}
 WORKDIR /app
 COPY ./src ./
 RUN npm install

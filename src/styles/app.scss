@@ -1,0 +1,35 @@
+// fonts
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;700&display=swap');
+@import 'bootstrap';
+
+// variables
+$navbar-height: 56px;
+
+// body
+body {
+    background: url('/bamboo.jpg');
+    font-family: 'Nunito', sans-serif;
+    overflow-y: scroll;
+}
+
+// main
+main {
+    margin-top: $navbar-height;
+}
+
+// navbar links
+.navbar-link {
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.navbar-connect-wallet {
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+// footer
+.footer-social-link {
+    font-size: 2em;
+    line-height: 1.5;
+}
