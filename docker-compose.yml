@@ -5,7 +5,6 @@ services:
         image: node:fermium-alpine
         container_name: uptownpanda.finance
         restart: always
-        stdin_open: true
         ports:
             - 3000:3000
         volumes:
