@@ -40,6 +40,9 @@ const Navbar: React.FC<NavbarProps> = ({ activePage }) => {
                         <NavbarLink href="/" activeHref={activePage}>
                             Home
                         </NavbarLink>
+                        <NavbarLink href="/presale" activeHref={activePage}>
+                            Presale
+                        </NavbarLink>
                         <NavbarLink href="/farm" activeHref={activePage}>
                             Farm
                         </NavbarLink>

@@ -18,9 +18,9 @@ const Content: React.FC<{}> = ({ children }) => {
                 </MetaMaskAlert>
             )}
 
-            {web3Context.isMetaMaskAvailable && !web3Context.isMetaMaskConnected && (
-                <MetaMaskAlert type={AlertType.INFO}>
-                    Connect your account through MetaMask if you wish to use our site's features.
+            {web3Context.isMetaMaskAvailable && web3Context.isInvalidNetworkSelected && (
+                <MetaMaskAlert type={AlertType.DANGER}>
+                    Sorry the selected Ethereum network in MetaMask is not supported.
                 </MetaMaskAlert>
             )}
 
