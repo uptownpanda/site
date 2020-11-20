@@ -1,16 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import Web3 from 'web3';
-import { provider } from 'web3-core/types';
-
-interface IEthereum {
-    networkVersion: string;
-    selectedAddress: string;
-    currentProvider: provider;
-}
-
-interface IMetaMaskWindow {
-    ethereum: IEthereum | undefined;
-}
+import { provider as EthereumProvider } from 'web3-core/types';
+import detectEtheremProvider from '@metamask/detect-provider';
+import FullPageLoader from './full-page-loader';
 
 enum NextEnvironment {
     DEVELOPMENT = 'development',
@@ -18,55 +10,27 @@ enum NextEnvironment {
     PRODUCTION = 'production',
 }
 
-interface IPresaleFetcher {
-    getPresaleData: () => number;
-}
-
 interface IWeb3Context {
     isLoading: boolean;
-    isMetaMaskAvailable: boolean;
-    isInvalidNetworkSelected: boolean;
-    presale: IPresaleFetcher;
+    isEthProviderAvailable: boolean;
+    isNetworkSupported: boolean;
+    web3: Web3;
+    connect: () => void;
+    account: string | null;
+    etherscan: string;
 }
-
-const defaultPresaleFetcher: IPresaleFetcher = {
-    getPresaleData: () => 0,
-};
 
 const defaultWeb3Context: IWeb3Context = {
     isLoading: true,
-    isMetaMaskAvailable: false,
-    isInvalidNetworkSelected: false,
-    presale: defaultPresaleFetcher,
+    isEthProviderAvailable: false,
+    isNetworkSupported: false,
+    web3: new Web3(),
+    connect: () => {},
+    account: null,
+    etherscan: '',
 };
 
 export const Web3Context = React.createContext<IWeb3Context>(defaultWeb3Context);
-
-const initWeb3Context = (ethereum: IEthereum, env: string): Partial<IWeb3Context> => {
-    let networkId = ethereum.networkVersion;
-    let isInvalidNetworkSelected = false;
-    const web3js = new Web3(ethereum.currentProvider);
-
-    switch (env) {
-        case NextEnvironment.DEVELOPMENT:
-        case NextEnvironment.STAGING:
-            isInvalidNetworkSelected = networkId !== '4'; // rinkeby network
-            break;
-
-        case NextEnvironment.PRODUCTION:
-            isInvalidNetworkSelected = networkId !== '1'; // mainnet network
-            break;
-
-        default:
-            throw new Error(`Unsupported environment '${env}'.`);
-    }
-
-    return {
-        isLoading: false,
-        isMetaMaskAvailable: true,
-        isInvalidNetworkSelected,
-    };
-};
 
 const Web3WriterContextProvider: React.FC<{}> = ({ children }) => {
     const currentEnv = process.env.NEXT_PUBLIC_ENVIRONMENT;
@@ -81,14 +45,76 @@ const Web3WriterContextProvider: React.FC<{}> = ({ children }) => {
     );
 
     useEffect(() => {
-        const metaMaskWindow = (window as unknown) as IMetaMaskWindow;
-        if (!metaMaskWindow.ethereum || !currentEnv) {
-            return;
-        }
-        updateWeb3Context(initWeb3Context(metaMaskWindow.ethereum, currentEnv));
+        const handleAccountChange = (accounts: string[]) => {
+            updateWeb3Context({ account: accounts.length > 0 ? accounts[0] : null });
+        };
+
+        const getSelectedNetworkData = (chainId: number): { isNetworkSupported: boolean; etherscan: string } => {
+            let isNetworkSupported;
+            let etherscan;
+
+            switch (currentEnv) {
+                case NextEnvironment.DEVELOPMENT:
+                case NextEnvironment.STAGING:
+                    isNetworkSupported = chainId === 4; // rinkeby network
+                    etherscan = 'https://rinkeby.etherscan.io';
+                    break;
+
+                case NextEnvironment.PRODUCTION:
+                    isNetworkSupported = chainId === 1; // mainnet network
+                    etherscan = 'https://etherscan.io';
+                    break;
+
+                default:
+                    throw new Error(`Unsupported environment '${currentEnv}'.`);
+            }
+
+            return { isNetworkSupported, etherscan };
+        };
+
+        const init = async () => {
+            try {
+                const ethereum = (await detectEtheremProvider()) as any;
+                if (!ethereum) {
+                    throw new Error('MetaMask not found');
+                }
+
+                ethereum.on('chainChanged', () => location.reload());
+                ethereum.on('accountsChanged', handleAccountChange);
+
+                const { isNetworkSupported, etherscan } = getSelectedNetworkData(Number(ethereum.chainId));
+                const web3 = new Web3(ethereum as EthereumProvider);
+                const connect = async () => {
+                    try {
+                        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                        handleAccountChange(accounts);
+                    } catch (e) {
+                        console.log(`Failed to connect account. Message: ${e}`);
+                    }
+                };
+
+                updateWeb3Context({
+                    isLoading: false,
+                    isEthProviderAvailable: true,
+                    isNetworkSupported,
+                    etherscan,
+                    web3,
+                    connect,
+                });
+            } catch (e) {
+                console.log(`Cannot determine ethereum provider. Message: ${e}`);
+                updateWeb3Context({ isLoading: false, isEthProviderAvailable: false });
+            }
+        };
+
+        !!currentEnv && init();
     }, [currentEnv, updateWeb3Context]);
 
-    return <Web3Context.Provider value={web3Context}>{children}</Web3Context.Provider>;
+    return web3Context.isLoading ? (
+        <FullPageLoader />
+    ) : (
+        <Web3Context.Provider value={web3Context}>{children}</Web3Context.Provider>
+    );
 };
 
 export default Web3WriterContextProvider;
