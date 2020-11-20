@@ -5,6 +5,7 @@ export enum AlertType {
     DANGER = 'danger',
     INFO = 'info',
     SECONDARY = 'secondary',
+    DARK = 'dark',
 }
 
 export interface AlertProps {

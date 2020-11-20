@@ -28,6 +28,11 @@ main {
     text-transform: uppercase;
 }
 
+// landing page
+.landing-logo-title {
+    text-shadow: -1px -1px 0 #000000, -1px 1px 0 #000000, 1px 1px 0 #000000, 1px -1px #000000, 3px 3px 0px rgba(0, 0, 0, 0.5);
+}
+
 // footer
 .footer-social-link {
     font-size: 2em;

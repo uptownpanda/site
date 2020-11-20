@@ -3,6 +3,7 @@ import Web3 from 'web3';
 import { provider as EthereumProvider } from 'web3-core/types';
 import detectEtheremProvider from '@metamask/detect-provider';
 import FullPageLoader from './full-page-loader';
+import PresaleContextProvider from './presale-context-provider';
 
 enum NextEnvironment {
     DEVELOPMENT = 'development',
@@ -113,7 +114,9 @@ const Web3WriterContextProvider: React.FC<{}> = ({ children }) => {
     return web3Context.isLoading ? (
         <FullPageLoader />
     ) : (
-        <Web3Context.Provider value={web3Context}>{children}</Web3Context.Provider>
+        <Web3Context.Provider value={web3Context}>
+            <PresaleContextProvider>{children}</PresaleContextProvider>
+        </Web3Context.Provider>
     );
 };
 
