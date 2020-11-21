@@ -51,33 +51,55 @@ const Presale: React.FC<{}> = () => {
                 <div className="container-md py-6">
                     <div className="row">
                         <div className="col-12">
-                            {isInitialized ? (
-                                <>
-                                    <div className="row">
-                                        <div className="col mb-4">
-                                            <Card titleIconClassName="fas fa-info" titleText="Presale Info">
-                                                <p className="card-text">
-                                                    Donec molestie lacus ligula, vel rhoncus ipsum eleifend quis. Proin
-                                                    tincidunt elit ligula, a posuere enim pellentesque in. Class aptent
-                                                    taciti sociosqu ad litora torquent per conubia nostra, per inceptos
-                                                    himenaeos. In eu ornare risus. Pellentesque in quam non nibh
-                                                    fermentum pellentesque. Sed facilisis sem tellus, in scelerisque
-                                                    nisl maximus et. Curabitur nec dictum ipsum. Integer urna ex,
-                                                    hendrerit nec dapibus vel, sodales ut lorem. Nullam pellentesque
-                                                    tortor semper metus sagittis, ac vestibulum quam cursus. Morbi eu
-                                                    nibh metus. Class aptent taciti sociosqu ad litora torquent per
-                                                    conubia nostra, per inceptos himenaeos. In hac habitasse platea
-                                                    dictumst. Aliquam erat volutpat. Donec auctor egestas pharetra. Nunc
-                                                    volutpat augue in ante porta, at varius neque porta. Integer
-                                                    tincidunt porta quam, eu auctor turpis pellentesque mattis.
-                                                </p>
-                                            </Card>
-                                        </div>
-                                    </div>
+                            <div className="row">
+                                <div className="col mb-4">
+                                    <Card titleIconClassName="fas fa-info-circle" titleText="Presale Info">
+                                        <p className="card-text">
+                                            Presale will be conducted in the manner described here. By the time you're
+                                            reading this, presale contract with all the other contracts will be
+                                            deployed. The presale contract address can be found on our Disord server,
+                                            Telegram and on this page. Verify that the contract's address match on all
+                                            of the stated sources.
+                                        </p>
 
-                                    <div className="row">
-                                        <div className="col-12 mb-4 col-md-6 mb-md-0">
-                                            <Card titleIconClassName="fas fa-tasks" titleText="Status">
+                                        <p className="card-text">
+                                            Once we start the presale, only whitelisted addresses will be able to
+                                            contribute. Presale will stop as soon as the hard cap is reached. If the
+                                            hard cap isn't reached, we will open contributions for everyone on the FCFS
+                                            basis. FCFS duration will be announced on our official channels (Discord,
+                                            Telegram).
+                                        </p>
+
+                                        <p className="card-text">
+                                            Maximum contribution per address is 2.5 ETH. Contributing in multiple
+                                            transactions is supported. For every invested ETH you will get 33 $UP
+                                            tokens. So for a maximum contribution of 2.5 ETH you will receive 82.5 $UP
+                                            tokens. Tokens are minted and sent to your address immediately after you
+                                            make a contribution. Tokens are locked and not transferrable while the
+                                            presale is active.
+                                        </p>
+
+                                        <p className="card-text">
+                                            Once the presale ends, 40% of collected funds will automatically be
+                                            transferred to the team's address. For the other 60%, $UP tokens will be
+                                            minted (minting ratio 1 ETH : 11 $UP). Those ETH along with the minted $UP
+                                            will automatically be transferred to the Uniswap liquidity pool. Liquidity
+                                            pool tokens will be sent to the liquidity lock contract where they will get
+                                            locked for 2 years. At the same time $UP tokens for our farms will be minted
+                                            and sent to the corresponding farm addresses. Once all of the above happens
+                                            tokens will be unlocked and transferrable, Uniswap trading will start and
+                                            farming will be enabled. Everything is automated, there will be no delays.
+                                            Once we hit the "end presale" button, our token will be live.
+                                        </p>
+                                    </Card>
+                                </div>
+                            </div>
+
+                            <div className="row">
+                                <div className="col-12 mb-4 col-md-6 mb-md-0">
+                                    <Card titleIconClassName="fas fa-battery-half" titleText="Status">
+                                        {isInitialized ? (
+                                            <>
                                                 {!isActive && (
                                                     <p className="card-text">
                                                         {!wasEnded ? (
@@ -155,37 +177,37 @@ const Presale: React.FC<{}> = () => {
                                                         Connect your wallet via MetaMask to check your contribution.
                                                     </Alert>
                                                 )}
-                                            </Card>
-                                        </div>
+                                            </>
+                                        ) : (
+                                            <Alert type={AlertType.WARNING}>
+                                                Contract data is unavailable. MetaMask is not installed.
+                                            </Alert>
+                                        )}
+                                    </Card>
+                                </div>
 
-                                        <div className="col-12 col-md-6">
-                                            <Card titleIconClassName="" titleText="Contracts">
-                                                <ul className="list-group">
-                                                    <PresaleContractAddress
-                                                        address={process.env.NEXT_PUBLIC_PRESALE_CONTRACT_ADDRESS}
-                                                    >
-                                                        Presale contract
-                                                    </PresaleContractAddress>
-                                                    <PresaleContractAddress
-                                                        address={process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS}
-                                                    >
-                                                        $UP token contract
-                                                    </PresaleContractAddress>
-                                                    <PresaleContractAddress
-                                                        address={process.env.NEXT_PUBLIC_LIQUIDITY_LOCK_CONTRACT_ADDRESS}
-                                                    >
-                                                        Liquidity lock contract
-                                                    </PresaleContractAddress>
-                                                </ul>
-                                            </Card>
-                                        </div>
-                                    </div>
-                                </>
-                            ) : (
-                                <Alert type={AlertType.WARNING} className="my-5">
-                                    Contract data is currently unavailable. Please try again by refreshing this page.
-                                </Alert>
-                            )}
+                                <div className="col-12 col-md-6">
+                                    <Card titleIconClassName="fas fa-file-signature" titleText="Contracts">
+                                        <ul className="list-group">
+                                            <PresaleContractAddress
+                                                address={process.env.NEXT_PUBLIC_PRESALE_CONTRACT_ADDRESS}
+                                            >
+                                                Presale contract
+                                            </PresaleContractAddress>
+                                            <PresaleContractAddress
+                                                address={process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS}
+                                            >
+                                                $UP token contract
+                                            </PresaleContractAddress>
+                                            <PresaleContractAddress
+                                                address={process.env.NEXT_PUBLIC_LIQUIDITY_LOCK_CONTRACT_ADDRESS}
+                                            >
+                                                Liquidity lock contract
+                                            </PresaleContractAddress>
+                                        </ul>
+                                    </Card>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

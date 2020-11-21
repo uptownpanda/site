@@ -49,6 +49,9 @@ const Navbar: React.FC<NavbarProps> = ({ activePage }) => {
                         <NavbarLink href="/harvest-history" activeHref={activePage}>
                             Harvest History
                         </NavbarLink>
+                        <NavbarLink href="/nfts" activeHref={activePage}>
+                            NFTs
+                        </NavbarLink>
                     </ul>
 
                     <NavbarConnectWallet />
