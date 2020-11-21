@@ -5,7 +5,7 @@ const Farm: React.FC<{}> = () => {
     return (
         <>
             <Head>
-                <title>Uptown panda | Farm - uptownpanda.finance</title>
+                <title>Uptown Panda | Farm - uptownpanda.finance</title>
             </Head>
 
             <div className="container-md py-3">
