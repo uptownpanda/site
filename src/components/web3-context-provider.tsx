@@ -3,7 +3,6 @@ import Web3 from 'web3';
 import { provider as EthereumProvider } from 'web3-core/types';
 import detectEtheremProvider from '@metamask/detect-provider';
 import FullPageLoader from './full-page-loader';
-import PresaleContextProvider from './presale-context-provider';
 import { getIsNetworkSupported } from '../utils/networks';
 
 interface IWeb3Context {
@@ -42,7 +41,7 @@ const Web3WriterContextProvider: React.FC<{}> = ({ children }) => {
             updateWeb3Context({ account: accounts.length > 0 ? accounts[0] : null });
         };
 
-        const init = async () => {
+        (async () => {
             try {
                 const ethereum = (await detectEtheremProvider()) as any;
                 if (!ethereum) {
@@ -74,16 +73,13 @@ const Web3WriterContextProvider: React.FC<{}> = ({ children }) => {
                 console.log(`Cannot determine ethereum provider. Message: ${e}`);
                 updateWeb3Context({ isLoading: false, isEthProviderAvailable: false });
             }
-        };
-        init();
+        })();
     }, [updateWeb3Context]);
 
     return web3Context.isLoading ? (
         <FullPageLoader />
     ) : (
-        <Web3Context.Provider value={web3Context}>
-            <PresaleContextProvider>{children}</PresaleContextProvider>
-        </Web3Context.Provider>
+        <Web3Context.Provider value={web3Context}>{children}</Web3Context.Provider>
     );
 };
 

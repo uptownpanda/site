@@ -1,3 +1,5 @@
+import { AbiItem } from 'web3-utils/types';
+
 export default [
     {
         inputs: [
@@ -64,4 +66,4 @@ export default [
         type: 'function',
         constant: true,
     },
-];
+] as AbiItem[];

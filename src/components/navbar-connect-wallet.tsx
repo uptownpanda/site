@@ -1,8 +1,9 @@
 import { useContext } from 'react';
+import { getEtherScanUrl } from '../utils/urls';
 import { Web3Context } from './web3-context-provider';
 
 const NavbarConnectWallet: React.FC<{}> = () => {
-    const { account, isEthProviderAvailable, connect, etherscan } = useContext(Web3Context);
+    const { account, isEthProviderAvailable, connect } = useContext(Web3Context);
 
     return (
         <form className="form-inline my-2 my-md-0">
@@ -18,7 +19,7 @@ const NavbarConnectWallet: React.FC<{}> = () => {
             ) : (
                 <a
                     className="btn btn-sm btn-outline-success connect-wallet"
-                    href={`${etherscan}/address/${account}`}
+                    href={`${getEtherScanUrl}/address/${account}`}
                     target="_blank"
                 >
                     Account: {`${account.substring(0, 6)}...${account.substring(account.length - 4)}`}

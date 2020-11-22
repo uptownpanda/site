@@ -9,14 +9,14 @@ const Content: React.FC<{}> = ({ children }) => {
     return (
         <main>
             {!isEthProviderAvailable && (
-                <MetaMaskAlert type={AlertType.DANGER}>
-                    MetaMask was not detected. If you wish to use our site, please install MetaMask extension.
+                <MetaMaskAlert type={AlertType.WARNING}>
+                    MetaMask was not detected, therefore features requiring blockchain access will not be available.
                 </MetaMaskAlert>
             )}
 
             {isEthProviderAvailable && !isNetworkSupported && (
-                <MetaMaskAlert type={AlertType.DANGER}>
-                    Sorry the selected Ethereum network is not supported.
+                <MetaMaskAlert type={AlertType.WARNING}>
+                    Sorry, the selected Ethereum network is not supported.
                 </MetaMaskAlert>
             )}
 

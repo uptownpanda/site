@@ -1,3 +1,5 @@
+import { AbiItem } from 'web3-utils/types';
+
 export default [
     {
         inputs: [
@@ -116,6 +118,20 @@ export default [
     {
         inputs: [],
         name: 'PRESALE_PRICE_MULTIPLIER',
+        outputs: [
+            {
+                internalType: 'uint256',
+                name: '',
+                type: 'uint256',
+            },
+        ],
+        stateMutability: 'view',
+        type: 'function',
+        constant: true,
+    },
+    {
+        inputs: [],
+        name: 'PRESALE_WEI_HARD_CAP',
         outputs: [
             {
                 internalType: 'uint256',
@@ -476,4 +492,4 @@ export default [
         stateMutability: 'nonpayable',
         type: 'function',
     },
-];
+] as AbiItem[];

@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import { useEffect, useRef, useState } from 'react';
 import Alert, { AlertType } from '../components/alert';
-import ComponentLoader from '../components/component-loader';
+import ComponentLoader, { ComponentLoaderColor } from '../components/component-loader';
 
 const NFTs: React.FC<{}> = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -32,7 +32,7 @@ const NFTs: React.FC<{}> = () => {
 
             {isLoading ? (
                 <>
-                    <ComponentLoader />
+                    <ComponentLoader color={ComponentLoaderColor.WHITE} className="py-6" />
                     <div className="d-none">{nftVideoTeaser}</div>
                 </>
             ) : (
