@@ -15,7 +15,7 @@ const PresaleContractAddress: React.FC<PresaleContractAddressProps> = ({ address
             <a
                 href={getEtherScanUrl(`address/${address}`)}
                 target="_blank"
-                className="text-success font-weight-bolder"
+                className="text-success font-weight-bold"
             >
                 {address}
             </a>

@@ -12,7 +12,7 @@ const Card: React.FC<CardProps> = ({ children, titleIconClassName, titleText }) 
     });
 
     return (
-        <div className="card shadow-sm h-100">
+        <div className="card h-100">
             <div className="card-body">
                 <h5 className="card-title font-weight-bold text-success">
                     <i className={titleIconClasses} />

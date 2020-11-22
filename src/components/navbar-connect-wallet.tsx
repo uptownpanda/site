@@ -10,7 +10,7 @@ const NavbarConnectWallet: React.FC<{}> = () => {
             {!account ? (
                 <button
                     disabled={!isEthProviderAvailable}
-                    className="btn btn-sm btn-outline-danger connect-wallet"
+                    className="btn btn-sm btn-outline-danger font-weight-bold text-uppercase"
                     type="button"
                     onClick={connect}
                 >
@@ -18,7 +18,7 @@ const NavbarConnectWallet: React.FC<{}> = () => {
                 </button>
             ) : (
                 <a
-                    className="btn btn-sm btn-outline-success connect-wallet"
+                    className="btn btn-sm btn-outline-success font-weight-bold text-uppercase"
                     href={`${getEtherScanUrl}/address/${account}`}
                     target="_blank"
                 >

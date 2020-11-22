@@ -25,7 +25,7 @@ const Presale: React.FC<{}> = () => {
     const totalAccountContribution = new BN(Web3.utils.toWei('2.5'));
     const totalAccountContributionDisplay = Web3.utils.fromWei(totalAccountContribution);
     const accountContributionDisplay = Web3.utils.fromWei(accountContribution);
-    const accountContributionPercent = (Number(accountContribution) * 100) / Number(totalAccountContribution);
+    const accountContributionPercent = (Number(accountContributionDisplay) * 100) / Number(totalAccountContributionDisplay);
 
     const totalSupply = new BN(Web3.utils.toWei('400'));
     const collectedSupply = totalSupply.sub(supplyLeft);

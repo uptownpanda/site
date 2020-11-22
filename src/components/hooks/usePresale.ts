@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import UptownPandaPresaleAbi from '../../contracts/UptownPandaPresaleAbi';
 import { Web3Context } from '../web3-context-provider';
 import BN from 'bn.js';

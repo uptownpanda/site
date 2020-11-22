@@ -41,7 +41,7 @@ const NFTs: React.FC<{}> = () => {
                         <div className="col-12 text-center">
                             <div>
                                 <Alert type={AlertType.SUCCESS} className="d-inline-block mb-5">
-                                    <span className="text-uppercase font-weight-bolder">
+                                    <span className="text-uppercase font-weight-bold">
                                         These badboys are coming soon! Stay tuned!
                                     </span>
                                 </Alert>

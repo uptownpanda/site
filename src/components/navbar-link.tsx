@@ -17,7 +17,7 @@ const NavbarLink: React.FC<NavbarLinkProps> = ({ href, activeHref, children }) =
     return (
         <li className={liClasses}>
             <Link href={href}>
-                <a className="nav-link navbar-link" href={href}>
+                <a className="nav-link font-weight-bold text-uppercase" href={href}>
                     {children} {isActive && <span className="sr-only">(current)</span>}
                 </a>
             </Link>
