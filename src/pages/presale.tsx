@@ -109,6 +109,7 @@ const Presale: React.FC<{}> = () => {
                                                         )}
                                                     </p>
                                                 )}
+
                                                 {isActive && (
                                                     <>
                                                         <p className="card-text mb-0">
@@ -118,11 +119,12 @@ const Presale: React.FC<{}> = () => {
                                                             {allowWhiteListAddressesOnly ? (
                                                                 <span>Only whitelist addresses can contribute.</span>
                                                             ) : (
-                                                                <span>Anyone can contribute.</span>
+                                                                <span>Anyone can contribute (FCFS is active).</span>
                                                             )}
                                                         </p>
                                                     </>
                                                 )}
+
                                                 {(isActive || wasEnded) && (
                                                     <>
                                                         <p className="card-text mb-0">
@@ -144,34 +146,36 @@ const Presale: React.FC<{}> = () => {
 
                                                 <div className="dropdown-divider my-4" />
 
-                                                <p className="card-text">
-                                                    {!allowWhiteListAddressesOnly || isAccountWhitelisted ? (
-                                                        <span>
-                                                            You are eligeble to participate in our presale (FCFS is
-                                                            active).
-                                                        </span>
-                                                    ) : (
-                                                        <span>You are not eligeble to participate in our presale.</span>
-                                                    )}
-                                                </p>
-
                                                 {!!account ? (
-                                                    <>
-                                                        <p className="card-text mb-0">
-                                                            Your contribution in ETHs ({accountContributionDisplay} /{' '}
-                                                            {totalAccountContributionDisplay})
+                                                    isAccountWhitelisted || !allowWhiteListAddressesOnly ? (
+                                                        <>
+                                                            <p className="carc-text">
+                                                                You are eligeble to participate in our presale.
+                                                            </p>
+
+                                                            <p className="card-text mb-0">
+                                                                Your contribution in ETHs ({accountContributionDisplay}{' '}
+                                                                / {totalAccountContributionDisplay})
+                                                            </p>
+
+                                                            <div className="progress">
+                                                                <div
+                                                                    className="progress-bar bg-success"
+                                                                    role="progressbar"
+                                                                    style={{
+                                                                        width: `${accountContributionPercent}%`,
+                                                                    }}
+                                                                    aria-valuenow={accountContributionPercent}
+                                                                    aria-valuemin={0}
+                                                                    aria-valuemax={100}
+                                                                ></div>
+                                                            </div>
+                                                        </>
+                                                    ) : (
+                                                        <p className="card-text">
+                                                            You are not eligeble to participate in our presale.
                                                         </p>
-                                                        <div className="progress">
-                                                            <div
-                                                                className="progress-bar bg-success"
-                                                                role="progressbar"
-                                                                style={{ width: `${accountContributionPercent}%` }}
-                                                                aria-valuenow={accountContributionPercent}
-                                                                aria-valuemin={0}
-                                                                aria-valuemax={100}
-                                                            ></div>
-                                                        </div>
-                                                    </>
+                                                    )
                                                 ) : (
                                                     <Alert type={AlertType.INFO}>
                                                         Connect your wallet via MetaMask to check your contribution.
