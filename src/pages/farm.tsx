@@ -9,7 +9,21 @@ import ComponentLoader, { ComponentLoaderColor } from '../components/component-l
 import Web3 from 'web3';
 import { format as formatDate, fromUnixTime } from 'date-fns';
 import { getEtherScanUrl } from '../utils/urls';
-import useApyPercent from '../components/hooks/useApyPercent';
+
+const getBuyFarmTokensLink = (farm: FarmType, farmTokenAddress: string) => {
+    switch (farm) {
+        case FarmType.UP:
+        case FarmType.WETH:
+        case FarmType.WBTC:
+            return `https://info.uniswap.org/token/${farmTokenAddress}`;
+
+        case FarmType.UP_ETH:
+            return `https://info.uniswap.org/pair/${farmTokenAddress}`;
+
+        default:
+            throw new Error(`Farm of type '${farm}' is not supported.`);
+    }
+};
 
 const Farm: React.FC<{}> = () => {
     const [activeFarm, setActiveFarm] = useState<FarmType>(FarmType.UP);
@@ -22,8 +36,10 @@ const Farm: React.FC<{}> = () => {
         nextHalvingTimestamp,
         farmAddress,
         farmToken,
-        buyFarmTokensLink,
+        farmTokenAddress,
         yourData,
+        totalStake,
+        apyPercent,
     } = useFarm(activeFarm);
 
     const {
@@ -31,7 +47,6 @@ const Farm: React.FC<{}> = () => {
         harvestableReward,
         isAccountConnected,
         isLoading: isAccountDataLoading,
-        totalStake,
         yourStake,
     } = yourData;
 
@@ -49,8 +64,6 @@ const Farm: React.FC<{}> = () => {
     const yourDailyUpRewardDisplay = Web3.utils.fromWei(yourDailyUpReward);
     const harvestableRewardDisplay = Web3.utils.fromWei(harvestableReward);
     const claimableHarvestedRewardDisplay = Web3.utils.fromWei(claimableHarvestedReward);
-    const apyPercent = useApyPercent(activeFarm, isAccountDataLoading, dailyUpReward, totalStake);
-    const apyPercentDisplay = apyPercent.toFixed(2);
 
     return (
         <>
@@ -121,7 +134,7 @@ const Farm: React.FC<{}> = () => {
                                                 <label className="mb-0 font-weight-bold">Farm token</label>
                                                 <span className="d-block">
                                                     <a
-                                                        href={buyFarmTokensLink}
+                                                        href={getBuyFarmTokensLink(activeFarm, farmTokenAddress)}
                                                         className="text-success font-weight-bold"
                                                         target="_blank"
                                                     >
@@ -160,7 +173,7 @@ const Farm: React.FC<{}> = () => {
 
                                                     <div className="form-group">
                                                         <label className="mb-0 font-weight-bold">APY %</label>
-                                                        <span className="d-block">{apyPercentDisplay}%</span>
+                                                        <span className="d-block">{apyPercent.toFixed(2)}%</span>
                                                     </div>
 
                                                     <div className="form-group">
