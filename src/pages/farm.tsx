@@ -9,7 +9,7 @@ import ComponentLoader, { ComponentLoaderColor } from '../components/component-l
 import Web3 from 'web3';
 import { format as formatDate, fromUnixTime } from 'date-fns';
 import { getEtherScanUrl } from '../utils/urls';
-import { BADNAME } from 'dns';
+import useApyPercent from '../components/hooks/useApyPercent';
 
 const Farm: React.FC<{}> = () => {
     const [activeFarm, setActiveFarm] = useState<FarmType>(FarmType.UP);
@@ -49,6 +49,8 @@ const Farm: React.FC<{}> = () => {
     const yourDailyUpRewardDisplay = Web3.utils.fromWei(yourDailyUpReward);
     const harvestableRewardDisplay = Web3.utils.fromWei(harvestableReward);
     const claimableHarvestedRewardDisplay = Web3.utils.fromWei(claimableHarvestedReward);
+    const apyPercent = useApyPercent(activeFarm, isAccountDataLoading, dailyUpReward, totalStake);
+    const apyPercentDisplay = apyPercent.toFixed(2);
 
     return (
         <>
@@ -144,8 +146,8 @@ const Farm: React.FC<{}> = () => {
                                                             Your staked / Total staked
                                                         </label>
                                                         <span className="d-block">
-                                                            {yourStakeDisplay} {farmToken} / {totalStakeDisplay} {farmToken} (
-                                                            {Math.floor(yourStakePercent)}%)
+                                                            {yourStakeDisplay} {farmToken} / {totalStakeDisplay}{' '}
+                                                            {farmToken} ({Math.floor(yourStakePercent)}%)
                                                         </span>
                                                     </div>
 
@@ -158,7 +160,7 @@ const Farm: React.FC<{}> = () => {
 
                                                     <div className="form-group">
                                                         <label className="mb-0 font-weight-bold">APY %</label>
-                                                        <span className="d-block">TODO</span>
+                                                        <span className="d-block">{apyPercentDisplay}%</span>
                                                     </div>
 
                                                     <div className="form-group">
