@@ -80,7 +80,7 @@ const Farm: React.FC<{}> = () => {
     const totalStakeNumber = Number(totalStakeDisplay);
     const yourStakeNumber = Number(yourStakeDisplay);
     const yourStakePercent = totalStakeNumber > 0 ? (yourStakeNumber * 100) / totalStakeNumber : 0;
-    const yourDailyUpReward = dailyUpReward.mul(Web3.utils.toBN(yourStakePercent)).div(Web3.utils.toBN(100));
+    const yourDailyUpReward = dailyUpReward.mul(Web3.utils.toBN(Math.floor(yourStakePercent))).div(Web3.utils.toBN(100));
     const yourDailyUpRewardDisplay = Web3.utils.fromWei(yourDailyUpReward);
     const harvestableRewardDisplay = Web3.utils.fromWei(harvestableReward);
     const claimableHarvestedRewardDisplay = Web3.utils.fromWei(claimableHarvestedReward);
