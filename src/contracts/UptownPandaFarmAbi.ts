@@ -47,7 +47,7 @@ export default [
                 type: 'address',
             },
             {
-                indexed: false,
+                indexed: true,
                 internalType: 'uint256',
                 name: 'harvestChunkIdx',
                 type: 'uint256',
@@ -405,7 +405,7 @@ export default [
     },
     {
         inputs: [],
-        name: 'claimHarvestedReward',
+        name: 'claim',
         outputs: [],
         stateMutability: 'nonpayable',
         type: 'function',
@@ -427,6 +427,20 @@ export default [
     {
         inputs: [],
         name: 'claimableHarvestedReward',
+        outputs: [
+            {
+                internalType: 'uint256',
+                name: '',
+                type: 'uint256',
+            },
+        ],
+        stateMutability: 'view',
+        type: 'function',
+        constant: true,
+    },
+    {
+        inputs: [],
+        name: 'totalHarvestedReward',
         outputs: [
             {
                 internalType: 'uint256',
