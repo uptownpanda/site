@@ -242,9 +242,9 @@ const useFarm = (activeFarm: Farm) => {
             updateUserData({ isLoading: showLoading });
 
             const hasApproved = !!account
-                ? Web3.utils.toBN(
-                      await farmTokenContract.methods.allowance(account, farmContract.options.address).call()
-                  ).gt(new BN(0))
+                ? Web3.utils
+                      .toBN(await farmTokenContract.methods.allowance(account, farmContract.options.address).call())
+                      .gt(new BN(0))
                 : false;
             const availableAmountForStaking = !!account
                 ? Web3.utils.toBN(await farmTokenContract.methods.balanceOf(account).call())
@@ -259,7 +259,9 @@ const useFarm = (activeFarm: Farm) => {
             const claimableHarvestedReward = !!account
                 ? Web3.utils.toBN(await farmContract.methods.claimableHarvestedReward().call({ from: account }))
                 : new BN(0);
-            const totalHarvestedReward = new BN(0); //Web3.utils.toBN(await contracts.farmContract.methods.totalHarvestedReward().call({ from: account })
+            const totalHarvestedReward = !!account
+                ? Web3.utils.toBN(await farmContract.methods.totalHarvestedReward().call({ from: account }))
+                : new BN(0);
 
             updateUserData({
                 isLoading: false,
