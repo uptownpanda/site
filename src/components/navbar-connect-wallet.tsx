@@ -19,7 +19,7 @@ const NavbarConnectWallet: React.FC<{}> = () => {
             ) : (
                 <a
                     className="btn btn-sm btn-outline-success font-weight-bold text-uppercase"
-                    href={`${getEtherScanUrl}/address/${account}`}
+                    href={getEtherScanUrl(`address/${account}`)}
                     target="_blank"
                 >
                     Account: {`${account.substring(0, 6)}...${account.substring(account.length - 4)}`}

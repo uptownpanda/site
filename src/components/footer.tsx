@@ -10,8 +10,8 @@ const Footer: React.FC<{}> = () => {
                             <FooterSocialLink title="Uptown Panda on Twitter" icon="twitter" href="https://twitter.com/PandaUptown" />
                             <FooterSocialLink title="Uptown Panda on Telegram" icon="telegram-plane" href="https://t.me/UptownPanda" />
                             <FooterSocialLink title="Uptown Panda on Discord" icon="discord" href="https://discord.gg/NGMpbMrkxA" />
-                            <FooterSocialLink title="Uptown Panda on Medium" icon="medium-m" href="https://medium.com/@uptownpanda" isLast={true} />
-                            {/*<FooterSocialLink title="Uptown Panda on GitHub" icon="github" href="https://github.com/uptown-panda" isLast={true} />*/}
+                            <FooterSocialLink title="Uptown Panda on Medium" icon="medium-m" href="https://medium.com/@uptownpanda" />
+                            <FooterSocialLink title="Uptown Panda on GitHub" icon="github" href="https://github.com/uptownpanda" isLast={true} />
                         </div>
                         <p>Copyright © 2020, uptownpanda.finance</p>
                         <p className="mb-0">UptownPanda is a DeFi experiment. The investor is fully responsible for the investment.</p>

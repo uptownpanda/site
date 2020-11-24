@@ -17,6 +17,12 @@ main {
     margin-top: $navbar-height;
 }
 
+// buttons
+.button-loading-spinner {
+    top: 2px;
+    position: relative;
+}
+
 // landing page
 .landing-logo-title {
     text-shadow: -1px -1px 0 #000000, -1px 1px 0 #000000, 1px 1px 0 #000000, 1px -1px #000000, 3px 3px 0px rgba(0, 0, 0, 0.5);

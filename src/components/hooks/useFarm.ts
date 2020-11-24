@@ -3,50 +3,56 @@ import BN from 'bn.js';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { Web3Context } from '../web3-context-provider';
 import UptownPandaFarmAbi from '../../contracts/UptownPandaFarmAbi';
+import IERC20Abi from '../../contracts/IERC20Abi';
 import Web3 from 'web3';
 import { getTokenInEthPrice, getUniswapLPTokenInEthPrice } from '../../utils/uniswap';
+import { Contract } from 'web3-eth-contract';
 
-export interface IYourFarmData {
+export interface IUserFarmData {
     isLoading: boolean;
-    isAccountConnected: boolean;
-    yourStake: BN;
+    hasApproved: boolean;
+    stakedAmount: BN;
+    totalStakedAmount: BN;
+    availableAmountForStaking: BN;
     harvestableReward: BN;
     claimableHarvestedReward: BN;
+    totalHarvestedReward: BN;
+    apyPercent: number;
+    isApyLoading: boolean;
 }
 
 export interface IFarmData {
     isLoading: boolean;
-    isDataValid: boolean;
+    farmContract: Contract | null;
+    farmTokenContract: Contract | null;
     hasFarmingStarted: boolean;
     totalUpSupply: BN;
     dailyUpReward: BN;
     nextHalvingTimestamp: number;
-    farmAddress: string;
-    yourData: IYourFarmData;
     farmToken: FarmToken;
-    farmTokenAddress: string;
-    apyPercent: number;
-    totalStake: BN;
+    userData: IUserFarmData;
 }
 
 const defaultFarmData: IFarmData = {
     isLoading: true,
-    isDataValid: false,
+    farmContract: null,
+    farmTokenContract: null,
     hasFarmingStarted: false,
     totalUpSupply: new BN(0),
     dailyUpReward: new BN(0),
     nextHalvingTimestamp: 0,
-    farmAddress: '',
     farmToken: FarmToken.UP,
-    farmTokenAddress: '',
-    apyPercent: 0,
-    totalStake: new BN(0),
-    yourData: {
+    userData: {
         isLoading: true,
-        isAccountConnected: false,
-        yourStake: new BN(0),
+        hasApproved: false,
+        availableAmountForStaking: new BN(0),
+        stakedAmount: new BN(0),
+        totalStakedAmount: new BN(0),
         harvestableReward: new BN(0),
         claimableHarvestedReward: new BN(0),
+        totalHarvestedReward: new BN(0),
+        apyPercent: 0,
+        isApyLoading: false,
     },
 };
 
@@ -162,125 +168,137 @@ const getApyPercent = async (web3: Web3, farm: Farm, farmTokenAddress: string, d
     }
 };
 
-const useFarm = (activeFarm: Farm): IFarmData => {
-    const { web3, isLoading: isWeb3ContextLoading, isEthProviderAvailable, isNetworkSupported, account } = useContext(
-        Web3Context
-    );
+const useFarm = (activeFarm: Farm) => {
     const [farmData, setFarmData] = useState<IFarmData>(defaultFarmData);
+    const { farmContract, farmTokenContract, hasFarmingStarted, dailyUpReward, userData } = farmData;
+    const { totalStakedAmount } = userData;
     const updateFarmData = useCallback(
         (updatedFarmData: Partial<IFarmData>) =>
             setFarmData((currentFarmData) => ({ ...currentFarmData, ...updatedFarmData })),
         [setFarmData]
     );
-    const updateYourData = useCallback(
-        (updatedYourData: Partial<IYourFarmData>) =>
+    const updateUserData = useCallback(
+        (updatedUserData: Partial<IUserFarmData>) =>
             setFarmData((currentFarmData) => ({
                 ...currentFarmData,
-                yourData: { ...currentFarmData.yourData, ...updatedYourData },
+                userData: { ...currentFarmData.userData, ...updatedUserData },
             })),
         [setFarmData]
     );
 
+    const { web3, isLoading: isWeb3ContextLoading, isEthProviderAvailable, isNetworkSupported, account } = useContext(
+        Web3Context
+    );
+    const shouldSetFarmData = !isWeb3ContextLoading && isEthProviderAvailable && isNetworkSupported;
+
+    // set farm data on farm switch
     useEffect(() => {
         const farmToken = getFarmToken(activeFarm);
-        const farmAddress = getFarmContractAddress(activeFarm);
 
-        setFarmData({ ...defaultFarmData, isLoading: true, isDataValid: true, farmToken, farmAddress });
-
-        if (isWeb3ContextLoading) {
+        if (!shouldSetFarmData) {
+            updateFarmData({ isLoading: false, farmToken, farmContract: null, farmTokenContract: null });
             return;
         }
 
-        if (!isEthProviderAvailable || !isNetworkSupported) {
-            setFarmData({ ...defaultFarmData, isLoading: false, isDataValid: false });
-            return;
-        }
+        updateFarmData({ isLoading: true, farmToken });
 
         (async () => {
-            const contract = new web3.eth.Contract(UptownPandaFarmAbi, farmAddress);
-
-            const hasFarmingStarted = await contract.methods.hasFarmingStarted().call();
+            const farmContractAddress = getFarmContractAddress(activeFarm);
+            const farmContract = new web3.eth.Contract(UptownPandaFarmAbi, farmContractAddress);
+            const farmTokenAddress = (await farmContract.methods.farmTokenAddress().call()) as string;
+            const farmTokenContract = new web3.eth.Contract(IERC20Abi, farmTokenAddress);
+            const hasFarmingStarted = (await farmContract.methods.hasFarmingStarted().call()) as boolean;
             if (!hasFarmingStarted) {
-                updateFarmData({ isLoading: false, isDataValid: true, hasFarmingStarted });
+                updateFarmData({ isLoading: false, farmContract, farmTokenContract, hasFarmingStarted });
                 return;
             }
-            const totalUpSupply = Web3.utils.toBN(await contract.methods.initialFarmUpSupply().call());
+            const totalUpSupply = Web3.utils.toBN(await farmContract.methods.initialFarmUpSupply().call());
             const currentIntervalTotalReward = Web3.utils.toBN(
-                await contract.methods.currentIntervalTotalReward().call()
+                await farmContract.methods.currentIntervalTotalReward().call()
             );
-            const rewardIntervalLengthInDays = new BN(
-                (await contract.methods.REWARD_HALVING_INTERVAL().call()) / (60 * 60 * 24)
+            const rewardIntervalLengthInDays = Web3.utils.toBN(
+                (await farmContract.methods.REWARD_HALVING_INTERVAL().call()) / (60 * 60 * 24)
             );
             const dailyUpReward = currentIntervalTotalReward.div(rewardIntervalLengthInDays);
-            const farmTokenAddress = await contract.methods.farmTokenAddress().call();
-            const nextHalvingTimestamp = Number(await contract.methods.nextIntervalTimestamp().call());
-            const totalStake = Web3.utils.toBN(await contract.methods.totalStakedSupply().call());
-            const apyPercent = await getApyPercent(web3, activeFarm, farmTokenAddress, dailyUpReward, totalStake);
-
+            const nextHalvingTimestamp = Number(await farmContract.methods.nextIntervalTimestamp().call());
             updateFarmData({
                 isLoading: false,
-                isDataValid: true,
                 hasFarmingStarted,
+                farmContract,
+                farmTokenContract,
                 totalUpSupply,
                 dailyUpReward,
                 nextHalvingTimestamp,
-                farmAddress,
-                farmTokenAddress,
-                totalStake,
-                apyPercent,
             });
         })();
-    }, [
-        web3,
-        isWeb3ContextLoading,
-        isEthProviderAvailable,
-        isNetworkSupported,
-        activeFarm,
-        setFarmData,
-        updateFarmData,
-    ]);
+    }, [shouldSetFarmData, web3, activeFarm, updateFarmData]);
 
-    useEffect(() => {
-        if (isWeb3ContextLoading || !isEthProviderAvailable || !isNetworkSupported) {
-            return;
-        }
-
-        updateYourData({ isLoading: true });
-
-        const farmAddress = getFarmContractAddress(activeFarm);
-        const contract = new web3.eth.Contract(UptownPandaFarmAbi, farmAddress);
-
-        (async () => {
-            if (!account) {
-                updateYourData({
-                    isLoading: false,
-                    isAccountConnected: false,
-                    yourStake: new BN(0),
-                    harvestableReward: new BN(0),
-                    claimableHarvestedReward: new BN(0),
-                });
+    const refreshFarmData = useCallback(
+        async (showLoading: boolean) => {
+            if (!farmContract || !farmTokenContract || !hasFarmingStarted) {
                 return;
             }
 
-            const yourStake = Web3.utils.toBN(await contract.methods.balances(account).call());
-            const harvestableReward = Web3.utils.toBN(
-                await contract.methods.harvestableReward().call({ from: account })
-            );
-            const claimableHarvestedReward = Web3.utils.toBN(
-                await contract.methods.claimableHarvestedReward().call({ from: account })
-            );
+            updateUserData({ isLoading: showLoading });
 
-            updateYourData({
+            const hasApproved = !!account
+                ? Web3.utils.toBN(
+                      await farmTokenContract.methods.allowance(account, farmContract.options.address).call()
+                  ).gt(new BN(0))
+                : false;
+            const availableAmountForStaking = !!account
+                ? Web3.utils.toBN(await farmTokenContract.methods.balanceOf(account).call())
+                : new BN(0);
+            const stakedAmount = !!account
+                ? Web3.utils.toBN(await farmContract.methods.balances(account).call())
+                : new BN(0);
+            const totalStakedAmount = Web3.utils.toBN(await farmContract.methods.totalStakedSupply().call());
+            const harvestableReward = !!account
+                ? Web3.utils.toBN(await farmContract.methods.harvestableReward().call({ from: account }))
+                : new BN(0);
+            const claimableHarvestedReward = !!account
+                ? Web3.utils.toBN(await farmContract.methods.claimableHarvestedReward().call({ from: account }))
+                : new BN(0);
+            const totalHarvestedReward = new BN(0); //Web3.utils.toBN(await contracts.farmContract.methods.totalHarvestedReward().call({ from: account })
+
+            updateUserData({
                 isLoading: false,
-                isAccountConnected: true,
-                yourStake,
+                hasApproved,
+                availableAmountForStaking,
+                stakedAmount,
+                totalStakedAmount,
                 harvestableReward,
                 claimableHarvestedReward,
+                totalHarvestedReward,
             });
-        })();
-    }, [isWeb3ContextLoading, isEthProviderAvailable, isNetworkSupported, activeFarm, account, updateYourData]);
+        },
+        [farmContract, farmTokenContract, hasFarmingStarted, account, updateUserData]
+    );
 
-    return farmData;
+    // whenever refresh farm data function updates, we need to call it to get the most recent data
+    useEffect(() => {
+        refreshFarmData(true);
+    }, [refreshFarmData]);
+
+    // apy refresh
+    useEffect(() => {
+        if (isWeb3ContextLoading || !farmTokenContract) {
+            return;
+        }
+        updateUserData({ isApyLoading: true });
+        (async () => {
+            const apyPercent = await getApyPercent(
+                web3,
+                activeFarm,
+                farmTokenContract.options.address,
+                dailyUpReward,
+                totalStakedAmount
+            );
+            updateUserData({ isApyLoading: false, apyPercent });
+        })();
+    }, [web3, farmTokenContract, isWeb3ContextLoading, activeFarm, dailyUpReward, totalStakedAmount, updateUserData]);
+
+    return { farmData, refreshFarmData };
 };
 
 export default useFarm;
