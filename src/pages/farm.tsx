@@ -116,6 +116,7 @@ const Farm: React.FC<{}> = () => {
                 return;
             }
             await onStakeClick(inputStakeAmountAsBN);
+            setInputStakeAmount('');
         }
     );
     const { isLoading: isWithdrawLoading, onClickWithLoading: withdrawOnClickWithLoading } = useOnClickLoadingButton(
@@ -454,7 +455,7 @@ const Farm: React.FC<{}> = () => {
                                                                                 Harvestable reward
                                                                             </label>
                                                                             <span className="d-block">
-                                                                                {harvestableRewardDisplay} {farmToken}
+                                                                                {harvestableRewardDisplay} $UP
                                                                             </span>
                                                                         </div>
 
