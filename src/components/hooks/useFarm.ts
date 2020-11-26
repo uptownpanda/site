@@ -56,7 +56,7 @@ const defaultFarmData: IFarmData = {
     },
 };
 
-const getFarmContractAddress = (farm: Farm) => {
+export const getFarmContractAddress = (farm: Farm) => {
     let farmAddress: string | undefined;
 
     switch (farm) {

@@ -15,6 +15,7 @@ import useOnClickLoadingButton from '../components/hooks/useOnClickLoadingButton
 import useFarmActionButtons from '../components/hooks/useFarmActionButtons';
 import { Web3Context } from '../components/web3-context-provider';
 import BN from 'bn.js';
+import FarmSelection from '../components/farm-selection';
 
 export enum FarmActionSection {
     APPROVE = 'approve',
@@ -173,42 +174,11 @@ const Farm: React.FC<{}> = () => {
             <div className="container-md py-6">
                 <div className="row">
                     <div className="col-12">
-                        <div className="list-group list-group-horizontal-md" role="tablist">
-                            <FarmLink
-                                onClick={(f) => !isLoading && setActiveFarm(f)}
-                                activeFarm={activeFarm}
-                                farm={FarmType.UP}
-                            >
-                                $UP farm
-                            </FarmLink>
-                            <FarmLink
-                                onClick={(f) => !isLoading && setActiveFarm(f)}
-                                activeFarm={activeFarm}
-                                farm={FarmType.UP_ETH}
-                            >
-                                $UP/ETH farm
-                            </FarmLink>
-                            <FarmLink
-                                onClick={(f) => !isLoading && setActiveFarm(f)}
-                                activeFarm={activeFarm}
-                                farm={FarmType.WETH}
-                            >
-                                WETH farm
-                            </FarmLink>
-                            <FarmLink
-                                onClick={(f) => !isLoading && setActiveFarm(f)}
-                                activeFarm={activeFarm}
-                                farm={FarmType.WBTC}
-                            >
-                                WBTC farm
-                            </FarmLink>
-                        </div>
+                        <FarmSelection isLoading={isLoading} activeFarm={activeFarm} setActiveFarm={setActiveFarm} />
                     </div>
                 </div>
 
-                {isLoading ? (
-                    <ComponentLoader color={ComponentLoaderColor.WHITE} className="mt-6" />
-                ) : (
+                {!isLoading ? (
                     <div className="row mt-4">
                         {isDataValid ? (
                             hasFarmingStarted ? (
@@ -645,6 +615,8 @@ const Farm: React.FC<{}> = () => {
                             </div>
                         )}
                     </div>
+                ) : (
+                    <ComponentLoader color={ComponentLoaderColor.WHITE} className="mt-6" />
                 )}
             </div>
         </>

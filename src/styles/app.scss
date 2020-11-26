@@ -17,6 +17,11 @@ main {
     margin-top: $navbar-height;
 }
 
+// tables
+th, td {
+    white-space: nowrap;
+}
+
 // buttons
 .button-loading-spinner {
     top: 2px;
@@ -26,6 +31,11 @@ main {
 // landing page
 .landing-logo-title {
     text-shadow: -1px -1px 0 #000000, -1px 1px 0 #000000, 1px 1px 0 #000000, 1px -1px #000000, 3px 3px 0px rgba(0, 0, 0, 0.5);
+}
+
+// harvest history page
+.details-button-td {
+    min-width: 130px;
 }
 
 // nfts
