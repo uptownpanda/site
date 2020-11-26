@@ -28,6 +28,14 @@ const useFarmActionButtons = (
         [farmContract, account, refreshFarmData]
     );
 
+    const onStakeAllClick = useCallback(async () => {
+        if (!farmTokenContract || !account) {
+            return;
+        }
+        const stakeAmount = new BN(await farmTokenContract.methods.balanceOf(account).call());
+        await onStakeClick(stakeAmount);
+    }, [farmTokenContract, account, onStakeClick]);
+
     const onWithdrawClick = useCallback(
         async (withdrawAmount: BN) => {
             if (!farmContract || !account) {
@@ -38,6 +46,14 @@ const useFarmActionButtons = (
         },
         [farmContract, account, refreshFarmData]
     );
+
+    const onWithdrawAllClick = useCallback(async () => {
+        if (!farmContract || !account) {
+            return;
+        }
+        const withdrawAmount = new BN(await farmContract.methods.balances(account).call());
+        await onWithdrawClick(withdrawAmount);
+    }, [farmContract, account, refreshFarmData, onWithdrawClick]);
 
     const onHarvestClick = useCallback(async () => {
         if (!farmContract || !account) {
@@ -55,7 +71,15 @@ const useFarmActionButtons = (
         await refreshFarmData(false);
     }, [farmContract, account, refreshFarmData]);
 
-    return { onApproveClick, onStakeClick, onWithdrawClick, onHarvestClick, onClaimClick };
+    return {
+        onApproveClick,
+        onStakeClick,
+        onStakeAllClick,
+        onWithdrawClick,
+        onWithdrawAllClick,
+        onHarvestClick,
+        onClaimClick,
+    };
 };
 
 export default useFarmActionButtons;

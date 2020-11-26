@@ -91,12 +91,15 @@ const Farm: React.FC<{}> = () => {
     const availableAmountForStakingDisplay = Web3.utils.fromWei(availableAmountForStaking);
 
     const [actionSection, setActionSection] = useState<FarmActionSection>(FarmActionSection.APPROVE);
-    const { onApproveClick, onStakeClick, onWithdrawClick, onHarvestClick, onClaimClick } = useFarmActionButtons(
-        farmContract,
-        farmTokenContract,
-        account,
-        refreshFarmData
-    );
+    const {
+        onApproveClick,
+        onStakeClick,
+        onStakeAllClick,
+        onWithdrawClick,
+        onWithdrawAllClick,
+        onHarvestClick,
+        onClaimClick,
+    } = useFarmActionButtons(farmContract, farmTokenContract, account, refreshFarmData);
 
     const { isLoading: isApproveLoading, onClickWithLoading: approveOnClickWithLoading } = useOnClickLoadingButton(
         onApproveClick
@@ -119,6 +122,13 @@ const Farm: React.FC<{}> = () => {
             setInputStakeAmount('');
         }
     );
+    const { isLoading: isStakeAllLoading, onClickWithLoading: stakeAllOnClickWithLoading } = useOnClickLoadingButton(
+        async () => {
+            await onStakeAllClick();
+            setInputStakeAmount('');
+        }
+    );
+    const areStakeInputsDisabled = isStakeDisabled || isStakeLoading || isStakeAllLoading;
     const [inputWithdrawAmount, setInputWithdrawAmount] = useState('');
     const isWithdrawDisabled = stakedAmount.isZero();
     const { isLoading: isWithdrawLoading, onClickWithLoading: withdrawOnClickWithLoading } = useOnClickLoadingButton(
@@ -137,6 +147,14 @@ const Farm: React.FC<{}> = () => {
             setInputWithdrawAmount('');
         }
     );
+    const {
+        isLoading: isWithdrawAllLoading,
+        onClickWithLoading: withdrawAllOnClickWithLoading,
+    } = useOnClickLoadingButton(async () => {
+        await onWithdrawAllClick();
+        setInputWithdrawAmount('');
+    });
+    const areWithdrawInputsDisabled = isWithdrawDisabled || isWithdrawLoading || isWithdrawAllLoading;
     const isHarvestDisabled = harvestableReward.isZero();
     const { isLoading: isHarvestLoading, onClickWithLoading: harvestOnClickWithLoading } = useOnClickLoadingButton(
         onHarvestClick
@@ -415,9 +433,11 @@ const Farm: React.FC<{}> = () => {
                                                                             >
                                                                                 <div className="input-group">
                                                                                     <input
-                                                                                        disabled={isStakeDisabled}
-                                                                                        type="number"
-                                                                                        className="form-control is-valid"
+                                                                                        disabled={
+                                                                                            areStakeInputsDisabled
+                                                                                        }
+                                                                                        type="text"
+                                                                                        className="form-control"
                                                                                         placeholder="amount to stake"
                                                                                         aria-label="amount to stake"
                                                                                         onChange={(e) =>
@@ -430,7 +450,9 @@ const Farm: React.FC<{}> = () => {
                                                                                     <div className="input-group-append">
                                                                                         <ActionButton
                                                                                             isLoading={isStakeLoading}
-                                                                                            isDisabled={isStakeDisabled}
+                                                                                            isDisabled={
+                                                                                                areStakeInputsDisabled
+                                                                                            }
                                                                                             type="submit"
                                                                                         >
                                                                                             Stake
@@ -441,10 +463,10 @@ const Farm: React.FC<{}> = () => {
                                                                                 <div className="d-block w-100 d-md-none" />
 
                                                                                 <ActionButton
-                                                                                    isLoading={isStakeLoading}
-                                                                                    isDisabled={isStakeDisabled}
+                                                                                    isLoading={isStakeAllLoading}
+                                                                                    isDisabled={areStakeInputsDisabled}
                                                                                     className="mt-3 mt-md-0 ml-md-3"
-                                                                                    onClick={() => {}}
+                                                                                    onClick={stakeAllOnClickWithLoading}
                                                                                 >
                                                                                     Stake all
                                                                                 </ActionButton>
@@ -489,9 +511,11 @@ const Farm: React.FC<{}> = () => {
                                                                             >
                                                                                 <div className="input-group">
                                                                                     <input
-                                                                                        disabled={isWithdrawDisabled}
-                                                                                        type="number"
-                                                                                        className="form-control is-valid"
+                                                                                        disabled={
+                                                                                            areWithdrawInputsDisabled
+                                                                                        }
+                                                                                        type="text"
+                                                                                        className="form-control"
                                                                                         placeholder="amount to withdraw"
                                                                                         aria-label="amount to withdraw"
                                                                                         onChange={(e) =>
@@ -503,8 +527,12 @@ const Farm: React.FC<{}> = () => {
                                                                                     />
                                                                                     <div className="input-group-append">
                                                                                         <ActionButton
-                                                                                            isLoading={isWithdrawLoading}
-                                                                                            isDisabled={isWithdrawDisabled}
+                                                                                            isLoading={
+                                                                                                isWithdrawLoading
+                                                                                            }
+                                                                                            isDisabled={
+                                                                                                areWithdrawInputsDisabled
+                                                                                            }
                                                                                             type="submit"
                                                                                         >
                                                                                             Withdraw
@@ -515,10 +543,14 @@ const Farm: React.FC<{}> = () => {
                                                                                 <div className="d-block w-100 d-lg-none" />
 
                                                                                 <ActionButton
-                                                                                    isLoading={isWithdrawLoading}
-                                                                                    isDisabled={isWithdrawDisabled}
+                                                                                    isLoading={isWithdrawAllLoading}
+                                                                                    isDisabled={
+                                                                                        areWithdrawInputsDisabled
+                                                                                    }
                                                                                     className="mt-3 mt-lg-0 ml-lg-3"
-                                                                                    onClick={() => {}}
+                                                                                    onClick={
+                                                                                        withdrawAllOnClickWithLoading
+                                                                                    }
                                                                                 >
                                                                                     Withdraw all
                                                                                 </ActionButton>

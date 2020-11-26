@@ -1,7 +1,10 @@
+
 @import '../node_modules/bootstrap/scss/functions';
 @import '../node_modules/bootstrap/scss/variables';
 @import '../node_modules/bootstrap/scss/mixins';
 
+$input-focus-border-color: lighten(theme-color("success"), 25%);
+$input-focus-box-shadow: 0 0 0 $input-btn-focus-width rgba(theme-color("success"), .25);
 $enable-responsive-font-sizes: true;
 $spacers: map-merge(
     (
