@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import Alert, { AlertType } from '../components/alert';
 import Card from '../components/card';
 import ComponentLoader, { ComponentLoaderColor } from '../components/component-loader';
@@ -8,10 +8,17 @@ import HarvestChunkTableRow from '../components/harvest-chunk-table-row';
 import useHarvestHistory from '../components/hooks/useHarvestHistory';
 import { Farm } from '../utils/enums';
 import cn from 'classnames';
+import Modal from '../components/modal';
+import HarvestChunkClaimTableRow from '../components/harvest-chunk-claim-table-row';
 
 const HarvestHistory: React.FC<{}> = () => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeFarm, setActiveFarm] = useState<Farm>(Farm.UP);
-    const { harvestHistory, harvestChunkDetails } = useHarvestHistory(activeFarm);
+    const onClaimsLoaded = useCallback(() => setIsModalOpen(true), [setIsModalOpen]);
+    const { harvestHistory, harvestChunkClaims, onHarvestChunkClaimDetailsRequest } = useHarvestHistory(
+        activeFarm,
+        onClaimsLoaded
+    );
     const {
         isLoading,
         isDataValid,
@@ -21,6 +28,7 @@ const HarvestHistory: React.FC<{}> = () => {
         harvestInterval,
         harvestStepPercent,
     } = harvestHistory;
+    const { harvestChunkIdx: loadingClaimsIndex, areClaimsLoading, claims } = harvestChunkClaims;
 
     const useFluidContainer = !isLoading && isDataValid && hasFarmingStarted && isAccountConnected;
     const containerClasses = cn('pb-6', {
@@ -89,16 +97,23 @@ const HarvestHistory: React.FC<{}> = () => {
                                                                     harvestChunkIndex={i}
                                                                     harvestInterval={harvestInterval}
                                                                     harvestStepPercent={harvestStepPercent}
-                                                                    onDetailsClick={(harvestChunkIndex) =>
-                                                                        console.log('clicked!!!!', harvestChunkIndex)
+                                                                    onDetailsClick={(harvestChunkIndex) => {
+                                                                        onHarvestChunkClaimDetailsRequest(
+                                                                            harvestChunkIndex
+                                                                        );
+                                                                    }}
+                                                                    loadingClaimsHarvestChunkIndex={
+                                                                        areClaimsLoading ? loadingClaimsIndex : null
                                                                     }
-                                                                    harvestChunkDetails={harvestChunkDetails}
                                                                 />
                                                             ))
                                                         ) : (
                                                             <tr>
                                                                 <td colSpan={8} className="text-center">
-                                                                    <Alert type={AlertType.INFO} className="mb-0 d-inline-block">
+                                                                    <Alert
+                                                                        type={AlertType.INFO}
+                                                                        className="mb-0 d-inline-block"
+                                                                    >
                                                                         No records found.
                                                                     </Alert>
                                                                 </td>
@@ -125,6 +140,46 @@ const HarvestHistory: React.FC<{}> = () => {
                     <ComponentLoader color={ComponentLoaderColor.WHITE} className="mt-6" />
                 )}
             </div>
+
+            <Modal
+                isOpen={isModalOpen}
+                setIsOpen={setIsModalOpen}
+                titleIcon="far fa-clipboard"
+                title="Harvest chunk claiming details"
+                id="harvest-chunk-claiming-details"
+                ariaLabelledBy="harvest-chunk-claiming-details-label"
+            >
+                <div className="table-responsive">
+                    <table className="table table-hover mb-0">
+                        <thead>
+                            <tr className="table-success">
+                                <th scope="colbn" className="text-right">
+                                    #
+                                </th>
+                                <th scope="col" className="text-right">
+                                    Date
+                                </th>
+                                <th scope="col" className="text-right">
+                                    Claimed $UP
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {!!claims.length ? (
+                                claims.map((c, i) => <HarvestChunkClaimTableRow key={i} claimIndex={i} claim={c} />)
+                            ) : (
+                                <tr>
+                                    <td colSpan={3} className="text-center">
+                                        <Alert type={AlertType.INFO} className="mb-0 d-inline-block">
+                                            No records found.
+                                        </Alert>
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </Modal>
         </>
     );
 };

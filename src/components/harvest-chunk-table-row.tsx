@@ -1,6 +1,6 @@
 import { format as formatDate, fromUnixTime } from 'date-fns';
 import Web3 from 'web3';
-import { IHarvestChunk, IHarvestChunkDetails } from './hooks/useHarvestHistory';
+import { IHarvestChunk } from './hooks/useHarvestHistory';
 import BN from 'bn.js';
 
 export interface HarvestChunkTableRowProps {
@@ -9,7 +9,7 @@ export interface HarvestChunkTableRowProps {
     harvestStepPercent: number;
     harvestInterval: number;
     onDetailsClick: (harvestChunkIndex: number) => void;
-    harvestChunkDetails: IHarvestChunkDetails;
+    loadingClaimsHarvestChunkIndex: number | null;
 }
 
 const HarvestChunkTableRow: React.FC<HarvestChunkTableRowProps> = ({
@@ -18,11 +18,11 @@ const HarvestChunkTableRow: React.FC<HarvestChunkTableRowProps> = ({
     harvestStepPercent,
     harvestInterval,
     onDetailsClick,
-    harvestChunkDetails,
+    loadingClaimsHarvestChunkIndex,
 }) => {
     const { timestamp, amount, isLoadingClaimed, claimed } = harvestChunk;
-    const { areLoading: areDetailsLoading, harvestChunkIndex: detailsHarvestChunkIndex } = harvestChunkDetails;
-    const showDetailsLoading = areDetailsLoading && harvestChunkIndex === detailsHarvestChunkIndex;
+    const isShowDetailsDisabled = loadingClaimsHarvestChunkIndex !== null;
+    const showDetailsLoading = harvestChunkIndex === loadingClaimsHarvestChunkIndex;
     const claimablePercent = Math.floor((Date.now() / 1000 - timestamp) / harvestInterval) * harvestStepPercent;
     const claimableAmount = amount.mul(new BN(claimablePercent)).div(new BN(100));
     const claimedPercent = !isLoadingClaimed
@@ -51,7 +51,7 @@ const HarvestChunkTableRow: React.FC<HarvestChunkTableRowProps> = ({
             <td className="details-button-td text-center">
                 <button
                     className="btn btn-sm btn-outline-success"
-                    disabled={showDetailsLoading}
+                    disabled={isShowDetailsDisabled}
                     onClick={() => onDetailsClick(harvestChunkIndex)}
                 >
                     {!showDetailsLoading ? (
