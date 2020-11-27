@@ -98,7 +98,7 @@ const Presale: React.FC<{}> = () => {
                                                 isAccountWhitelisted || !allowWhiteListAddressesOnly ? (
                                                     <>
                                                         <p className="carc-text">
-                                                            You are eligeble to participate in our presale.
+                                                            You are eligible to participate in our presale.
                                                         </p>
 
                                                         <p className="card-text mb-0">
@@ -121,7 +121,7 @@ const Presale: React.FC<{}> = () => {
                                                     </>
                                                 ) : (
                                                     <p className="card-text">
-                                                        You are not eligeble to participate in our presale.
+                                                        You are not eligible to participate in our presale.
                                                     </p>
                                                 )
                                             ) : (

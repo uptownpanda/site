@@ -28,12 +28,14 @@ export enum FarmActionSection {
 const getBuyFarmTokensLink = (farm: FarmType, farmTokenAddress: string) => {
     switch (farm) {
         case FarmType.UP:
+            return `https://app.uniswap.org/#/swap?inputCurrency=${process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS}`;
+            
         case FarmType.WETH:
         case FarmType.WBTC:
             return `https://info.uniswap.org/token/${farmTokenAddress}`;
 
         case FarmType.UP_ETH:
-            return `https://info.uniswap.org/pair/${farmTokenAddress}`;
+            return `https://app.uniswap.org/#/add/ETH/${process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS}`;
 
         default:
             throw new Error(`Farm of type '${farm}' is not supported.`);
