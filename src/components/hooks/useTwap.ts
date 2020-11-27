@@ -21,7 +21,7 @@ const useTwap = () => {
                 const newTwap = new BN(await contract.methods.currentTwap().call()).div(new BN(11));
                 setTwap(newTwap);
             })();
-        }, 60000);
+        }, 30000);
         return () => {
             clearInterval(interval);
         };
