@@ -1,7 +1,15 @@
 import Head from 'next/head';
 import Card from '../components/card';
+import useTwap from '../components/hooks/useTwap';
+import Web3 from 'web3';
+import ComponentLoader, { ComponentLoaderColor } from '../components/component-loader';
+import React from 'react';
+import Alert, { AlertType } from '../components/alert';
 
 const Home: React.FC<{}> = () => {
+    const { twap, isLoading, isDataAvailable } = useTwap();
+    const twapDisplay = Web3.utils.fromWei(twap);
+
     return (
         <>
             <Head>
@@ -9,6 +17,19 @@ const Home: React.FC<{}> = () => {
             </Head>
 
             <div className="container-md py-6">
+                <div className="row mb-5">
+                    <div className="col">
+                        <Card titleIconClassName="fas fa-dollar-sign" titleText="Current TWAP">
+                            {isLoading ? (
+                                <ComponentLoader color={ComponentLoaderColor.SUCCESS} />
+                            ) : isDataAvailable ? (
+                                <div>Current TWAP is: {twapDisplay}X</div>
+                            ) : (
+                                <Alert type={AlertType.WARNING}>Contract data is unavailable.</Alert>
+                            )}
+                        </Card>
+                    </div>
+                </div>
                 <div className="row">
                     <div className="col">
                         <img
