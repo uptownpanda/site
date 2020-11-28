@@ -1,14 +1,14 @@
 import Head from 'next/head';
 import Card from '../components/card';
 import useTwap from '../components/hooks/useTwap';
-import Web3 from 'web3';
 import ComponentLoader, { ComponentLoaderColor } from '../components/component-loader';
 import React from 'react';
 import Alert, { AlertType } from '../components/alert';
 
 const Home: React.FC<{}> = () => {
     const { twap, isLoading, isDataAvailable } = useTwap();
-    const twapDisplay = Web3.utils.fromWei(twap);
+    const twapDisplay = twap.toFixed(2);
+    const burnRate = Math.round(twap <= 3 ? 30 : twap >= 10 ? 5 : 30 - (25 * (twap - 3)) / 7);
 
     return (
         <>
@@ -17,15 +17,29 @@ const Home: React.FC<{}> = () => {
             </Head>
 
             <div className="container-md py-6">
-                <div className="row mb-5">
-                    <div className="col">
-                        <Card titleIconClassName="fas fa-dollar-sign" titleText="Current TWAP">
+                <div className="row justify-content-center mb-5">
+                    <div className="col col-md-6 col-xl-4">
+                        <Card titleIconClassName="fas fa-dollar-sign" titleText="Current price info">
                             {isLoading ? (
                                 <ComponentLoader color={ComponentLoaderColor.SUCCESS} />
                             ) : isDataAvailable ? (
-                                <div>Current TWAP is: {twapDisplay}X</div>
+                                <>
+                                    <div className="form-group">
+                                        <label className="mb-0 font-weight-bold">
+                                            TWAP (compared to listing price)
+                                        </label>
+                                        <span className="d-block">x{twapDisplay}</span>
+                                    </div>
+
+                                    <div className="form-group mb-0">
+                                        <label className="mb-0 font-weight-bold">Burn rate %</label>
+                                        <span className="d-block">{burnRate}%</span>
+                                    </div>
+                                </>
                             ) : (
-                                <Alert type={AlertType.WARNING}>Contract data is unavailable.</Alert>
+                                <Alert type={AlertType.WARNING} className="mb-0">
+                                    Contract data is unavailable.
+                                </Alert>
                             )}
                         </Card>
                     </div>

@@ -42,6 +42,16 @@ const getBuyFarmTokensLink = (farm: FarmType, farmTokenAddress: string) => {
     }
 };
 
+const farmTokenValueDisplayer = (farm: FarmType, amount: BN) => {
+    switch (farm) {
+        case FarmType.WBTC:
+            return Web3.utils.fromWei(amount.mul(new BN(10)), 'gwei');
+        
+        default:
+            return Web3.utils.fromWei(amount);
+    }
+};
+
 const Farm: React.FC<{}> = () => {
     const { account } = useContext(Web3Context);
     const [activeFarm, setActiveFarm] = useState<FarmType>(FarmType.UP);
@@ -78,8 +88,8 @@ const Farm: React.FC<{}> = () => {
     const dailyUpRewardDisplay = Web3.utils.fromWei(dailyUpReward);
     const nextHalvingFormatted =
         nextHalvingTimestamp > 0 ? formatDate(fromUnixTime(nextHalvingTimestamp), 'PPppp') : '';
-    const yourStakeDisplay = Web3.utils.fromWei(stakedAmount);
-    const totalStakeDisplay = Web3.utils.fromWei(totalStakedAmount);
+    const yourStakeDisplay = farmTokenValueDisplayer(activeFarm, stakedAmount);
+    const totalStakeDisplay = farmTokenValueDisplayer(activeFarm, totalStakedAmount);
     const totalStakeNumber = Number(totalStakeDisplay);
     const yourStakeNumber = Number(yourStakeDisplay);
     const yourStakePercent = totalStakeNumber > 0 ? (yourStakeNumber * 100) / totalStakeNumber : 0;
@@ -91,7 +101,7 @@ const Farm: React.FC<{}> = () => {
     const claimableHarvestedRewardDisplay = Web3.utils.fromWei(claimableHarvestedReward);
     const totalHarvestedRewardDisplay = Web3.utils.fromWei(totalHarvestedReward);
 
-    const availableAmountForStakingDisplay = Web3.utils.fromWei(availableAmountForStaking);
+    const availableAmountForStakingDisplay = farmTokenValueDisplayer(activeFarm, availableAmountForStaking);
 
     const [actionSection, setActionSection] = useState<FarmActionSection>(FarmActionSection.APPROVE);
     const {
