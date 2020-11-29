@@ -178,7 +178,7 @@ const useFarm = (activeFarm: Farm) => {
         dailyUpReward,
         userData,
     } = farmData;
-    const { totalStakedAmount } = userData;
+    const { isLoading: isUserDataLoading, totalStakedAmount } = userData;
     const updateFarmData = useCallback(
         (updatedFarmData: Partial<IFarmData>) =>
             setFarmData((currentFarmData) => ({ ...currentFarmData, ...updatedFarmData })),
@@ -292,7 +292,7 @@ const useFarm = (activeFarm: Farm) => {
     // apy refresh
     useEffect(() => {
         updateUserData({ isApyLoading: true });
-        if (isWeb3ContextLoading || !farmTokenContract || isFarmDataLoading) {
+        if (isWeb3ContextLoading || !farmTokenContract || isFarmDataLoading || isUserDataLoading) {
             return;
         }
         (async () => {
@@ -309,6 +309,7 @@ const useFarm = (activeFarm: Farm) => {
         web3,
         farmTokenContract,
         isFarmDataLoading,
+        isUserDataLoading,
         isWeb3ContextLoading,
         activeFarm,
         dailyUpReward,
