@@ -170,7 +170,14 @@ const getApyPercent = async (web3: Web3, farm: Farm, farmTokenAddress: string, d
 
 const useFarm = (activeFarm: Farm) => {
     const [farmData, setFarmData] = useState<IFarmData>(defaultFarmData);
-    const { farmContract, farmTokenContract, hasFarmingStarted, dailyUpReward, userData } = farmData;
+    const {
+        isLoading: isFarmDataLoading,
+        farmContract,
+        farmTokenContract,
+        hasFarmingStarted,
+        dailyUpReward,
+        userData,
+    } = farmData;
     const { totalStakedAmount } = userData;
     const updateFarmData = useCallback(
         (updatedFarmData: Partial<IFarmData>) =>
@@ -284,10 +291,10 @@ const useFarm = (activeFarm: Farm) => {
 
     // apy refresh
     useEffect(() => {
-        if (isWeb3ContextLoading || !farmTokenContract) {
+        updateUserData({ isApyLoading: true });
+        if (isWeb3ContextLoading || !farmTokenContract || isFarmDataLoading) {
             return;
         }
-        updateUserData({ isApyLoading: true });
         (async () => {
             const apyPercent = await getApyPercent(
                 web3,
@@ -298,7 +305,16 @@ const useFarm = (activeFarm: Farm) => {
             );
             updateUserData({ isApyLoading: false, apyPercent });
         })();
-    }, [web3, farmTokenContract, isWeb3ContextLoading, activeFarm, dailyUpReward, totalStakedAmount, updateUserData]);
+    }, [
+        web3,
+        farmTokenContract,
+        isFarmDataLoading,
+        isWeb3ContextLoading,
+        activeFarm,
+        dailyUpReward,
+        totalStakedAmount,
+        updateUserData,
+    ]);
 
     return { farmData, refreshFarmData };
 };
