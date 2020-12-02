@@ -9,7 +9,7 @@ const Home: React.FC<{}> = () => {
     const { twap, isLoading, isDataAvailable } = useTwap();
     const twapDisplay = twap.toFixed(2);
     const burnRate = Math.round(twap <= 3 ? 30 : twap >= 10 ? 5 : 30 - (25 * (twap - 3)) / 7);
-
+    
     return (
         <>
             <Head>
