@@ -1,6 +1,4 @@
 import { useContext, useEffect, useState } from 'react';
-
-import BN from 'bn.js';
 import { Web3Context } from '../web3-context-provider';
 import UptownPandaAbi from '../../contracts/UptownPandaAbi';
 import Web3 from 'web3';
