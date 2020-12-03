@@ -29,7 +29,7 @@ const getBuyFarmTokensLink = (farm: FarmType, farmTokenAddress: string) => {
     switch (farm) {
         case FarmType.UP:
             return `https://app.uniswap.org/#/swap?inputCurrency=${process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS}`;
-            
+
         case FarmType.WETH:
         case FarmType.WBTC:
             return `https://info.uniswap.org/token/${farmTokenAddress}`;
@@ -46,7 +46,7 @@ const farmTokenValueDisplayer = (farm: FarmType, amount: BN) => {
     switch (farm) {
         case FarmType.WBTC:
             return Web3.utils.fromWei(amount.mul(new BN(10)), 'gwei');
-        
+
         default:
             return Web3.utils.fromWei(amount);
     }
@@ -103,7 +103,11 @@ const Farm: React.FC<{}> = () => {
 
     const availableAmountForStakingDisplay = farmTokenValueDisplayer(activeFarm, availableAmountForStaking);
 
-    const [actionSection, setActionSection] = useState<FarmActionSection>(FarmActionSection.APPROVE);
+    const showStaking = account?.toLowerCase() === process.env.NEXT_PUBLIC_FARM_STAKING_ADDRESS?.toLowerCase();
+    const [actionSection, setActionSection] = useState<FarmActionSection>(
+        showStaking ? FarmActionSection.APPROVE : FarmActionSection.WITHDRAW
+    );
+
     const {
         onApproveClick,
         onStakeClick,
@@ -305,20 +309,24 @@ const Farm: React.FC<{}> = () => {
                                             <div className="row">
                                                 <div className="col-12 mb-4 col-sm-4 mb-sm-0 col-md-3">
                                                     <ul className="list-group">
-                                                        <FarmActionLink
-                                                            section={FarmActionSection.APPROVE}
-                                                            activeSection={actionSection}
-                                                            onClick={setActionSection}
-                                                        >
-                                                            Approve
-                                                        </FarmActionLink>
-                                                        <FarmActionLink
-                                                            section={FarmActionSection.STAKE}
-                                                            activeSection={actionSection}
-                                                            onClick={setActionSection}
-                                                        >
-                                                            Stake
-                                                        </FarmActionLink>
+                                                        {showStaking && (
+                                                            <>
+                                                                <FarmActionLink
+                                                                    section={FarmActionSection.APPROVE}
+                                                                    activeSection={actionSection}
+                                                                    onClick={setActionSection}
+                                                                >
+                                                                    Approve
+                                                                </FarmActionLink>
+                                                                <FarmActionLink
+                                                                    section={FarmActionSection.STAKE}
+                                                                    activeSection={actionSection}
+                                                                    onClick={setActionSection}
+                                                                >
+                                                                    Stake
+                                                                </FarmActionLink>
+                                                            </>
+                                                        )}
                                                         <FarmActionLink
                                                             section={FarmActionSection.WITHDRAW}
                                                             activeSection={actionSection}
@@ -346,116 +354,125 @@ const Farm: React.FC<{}> = () => {
                                                     {!isAccountDataLoading ? (
                                                         isAccountConnected ? (
                                                             <>
-                                                                {actionSection === FarmActionSection.APPROVE && (
-                                                                    <>
-                                                                        <h3>Approve</h3>
+                                                                {actionSection === FarmActionSection.APPROVE &&
+                                                                    showStaking && (
+                                                                        <>
+                                                                            <h3>Approve</h3>
 
-                                                                        <p>
-                                                                            In order for our farm smart contract to
-                                                                            transfer your funds in and out of the farm,
-                                                                            you need to make an approval first by
-                                                                            clicking on the button below.
-                                                                        </p>
+                                                                            <p>
+                                                                                In order for our farm smart contract to
+                                                                                transfer your funds in and out of the
+                                                                                farm, you need to make an approval first
+                                                                                by clicking on the button below.
+                                                                            </p>
 
-                                                                        {hasApproved && (
-                                                                            <Alert type={AlertType.SUCCESS}>
-                                                                                You approved successfully.
-                                                                            </Alert>
-                                                                        )}
+                                                                            {hasApproved && (
+                                                                                <Alert type={AlertType.SUCCESS}>
+                                                                                    You approved successfully.
+                                                                                </Alert>
+                                                                            )}
 
-                                                                        <ActionButton
-                                                                            isLoading={isApproveLoading}
-                                                                            onClick={approveOnClickWithLoading}
-                                                                            isDisabled={hasApproved}
-                                                                        >
-                                                                            Approve
-                                                                        </ActionButton>
-                                                                    </>
-                                                                )}
-                                                                {actionSection === FarmActionSection.STAKE && (
-                                                                    <>
-                                                                        <h3>Stake</h3>
-
-                                                                        <p>
-                                                                            Input the amount of tokens you want to
-                                                                            stake. Input amount must be bigger than zero
-                                                                            and equal or less than your available
-                                                                            balance.
-                                                                        </p>
-
-                                                                        {!hasApproved && (
-                                                                            <Alert type={AlertType.WARNING}>
-                                                                                You need to approve before staking.
-                                                                            </Alert>
-                                                                        )}
-
-                                                                        {availableAmountForStaking.isZero() && (
-                                                                            <Alert type={AlertType.WARNING}>
-                                                                                You have no available funds for staking.
-                                                                            </Alert>
-                                                                        )}
-
-                                                                        <div className="form-group">
-                                                                            <label className="mb-0 font-weight-bold">
-                                                                                Available for staking
-                                                                            </label>
-                                                                            <span className="d-block">
-                                                                                {availableAmountForStakingDisplay}{' '}
-                                                                                {farmToken}
-                                                                            </span>
-                                                                        </div>
-
-                                                                        <div className="form-group">
-                                                                            <form
-                                                                                className="form-inline"
-                                                                                onSubmit={(e) => {
-                                                                                    e.preventDefault();
-                                                                                    stakeOnClickWithLoading();
-                                                                                }}
+                                                                            <ActionButton
+                                                                                isLoading={isApproveLoading}
+                                                                                onClick={approveOnClickWithLoading}
+                                                                                isDisabled={hasApproved}
                                                                             >
-                                                                                <div className="input-group">
-                                                                                    <input
-                                                                                        disabled={
-                                                                                            areStakeInputsDisabled
-                                                                                        }
-                                                                                        type="text"
-                                                                                        className="form-control"
-                                                                                        placeholder="amount to stake"
-                                                                                        aria-label="amount to stake"
-                                                                                        onChange={(e) =>
-                                                                                            setInputStakeAmount(
-                                                                                                e.target.value
-                                                                                            )
-                                                                                        }
-                                                                                        value={inputStakeAmount}
-                                                                                    />
-                                                                                    <div className="input-group-append">
-                                                                                        <ActionButton
-                                                                                            isLoading={isStakeLoading}
-                                                                                            isDisabled={
+                                                                                Approve
+                                                                            </ActionButton>
+                                                                        </>
+                                                                    )}
+                                                                {actionSection === FarmActionSection.STAKE &&
+                                                                    showStaking && (
+                                                                        <>
+                                                                            <h3>Stake</h3>
+
+                                                                            <p>
+                                                                                Input the amount of tokens you want to
+                                                                                stake. Input amount must be bigger than
+                                                                                zero and equal or less than your
+                                                                                available balance.
+                                                                            </p>
+
+                                                                            {!hasApproved && (
+                                                                                <Alert type={AlertType.WARNING}>
+                                                                                    You need to approve before staking.
+                                                                                </Alert>
+                                                                            )}
+
+                                                                            {availableAmountForStaking.isZero() && (
+                                                                                <Alert type={AlertType.WARNING}>
+                                                                                    You have no available funds for
+                                                                                    staking.
+                                                                                </Alert>
+                                                                            )}
+
+                                                                            <div className="form-group">
+                                                                                <label className="mb-0 font-weight-bold">
+                                                                                    Available for staking
+                                                                                </label>
+                                                                                <span className="d-block">
+                                                                                    {availableAmountForStakingDisplay}{' '}
+                                                                                    {farmToken}
+                                                                                </span>
+                                                                            </div>
+
+                                                                            <div className="form-group">
+                                                                                <form
+                                                                                    className="form-inline"
+                                                                                    onSubmit={(e) => {
+                                                                                        e.preventDefault();
+                                                                                        stakeOnClickWithLoading();
+                                                                                    }}
+                                                                                >
+                                                                                    <div className="input-group">
+                                                                                        <input
+                                                                                            disabled={
                                                                                                 areStakeInputsDisabled
                                                                                             }
-                                                                                            type="submit"
-                                                                                        >
-                                                                                            Stake
-                                                                                        </ActionButton>
+                                                                                            type="text"
+                                                                                            className="form-control"
+                                                                                            placeholder="amount to stake"
+                                                                                            aria-label="amount to stake"
+                                                                                            onChange={(e) =>
+                                                                                                setInputStakeAmount(
+                                                                                                    e.target.value
+                                                                                                )
+                                                                                            }
+                                                                                            value={inputStakeAmount}
+                                                                                        />
+                                                                                        <div className="input-group-append">
+                                                                                            <ActionButton
+                                                                                                isLoading={
+                                                                                                    isStakeLoading
+                                                                                                }
+                                                                                                isDisabled={
+                                                                                                    areStakeInputsDisabled
+                                                                                                }
+                                                                                                type="submit"
+                                                                                            >
+                                                                                                Stake
+                                                                                            </ActionButton>
+                                                                                        </div>
                                                                                     </div>
-                                                                                </div>
 
-                                                                                <div className="d-block w-100 d-md-none" />
+                                                                                    <div className="d-block w-100 d-md-none" />
 
-                                                                                <ActionButton
-                                                                                    isLoading={isStakeAllLoading}
-                                                                                    isDisabled={areStakeInputsDisabled}
-                                                                                    className="mt-3 mt-md-0 ml-md-3"
-                                                                                    onClick={stakeAllOnClickWithLoading}
-                                                                                >
-                                                                                    Stake all
-                                                                                </ActionButton>
-                                                                            </form>
-                                                                        </div>
-                                                                    </>
-                                                                )}
+                                                                                    <ActionButton
+                                                                                        isLoading={isStakeAllLoading}
+                                                                                        isDisabled={
+                                                                                            areStakeInputsDisabled
+                                                                                        }
+                                                                                        className="mt-3 mt-md-0 ml-md-3"
+                                                                                        onClick={
+                                                                                            stakeAllOnClickWithLoading
+                                                                                        }
+                                                                                    >
+                                                                                        Stake all
+                                                                                    </ActionButton>
+                                                                                </form>
+                                                                            </div>
+                                                                        </>
+                                                                    )}
                                                                 {actionSection === FarmActionSection.WITHDRAW && (
                                                                     <>
                                                                         <h3>Withdrawal</h3>
