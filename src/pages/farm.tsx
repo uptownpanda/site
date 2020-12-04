@@ -105,7 +105,7 @@ const Farm: React.FC<{}> = () => {
 
     const showStaking = account?.toLowerCase() === process.env.NEXT_PUBLIC_FARM_STAKING_ADDRESS?.toLowerCase();
     const [actionSection, setActionSection] = useState<FarmActionSection>(
-        showStaking ? FarmActionSection.APPROVE : FarmActionSection.WITHDRAW
+        showStaking ? FarmActionSection.APPROVE : FarmActionSection.HARVEST
     );
 
     const {
@@ -325,15 +325,15 @@ const Farm: React.FC<{}> = () => {
                                                                 >
                                                                     Stake
                                                                 </FarmActionLink>
+                                                                <FarmActionLink
+                                                                    section={FarmActionSection.WITHDRAW}
+                                                                    activeSection={actionSection}
+                                                                    onClick={setActionSection}
+                                                                >
+                                                                    Withdraw
+                                                                </FarmActionLink>
                                                             </>
                                                         )}
-                                                        <FarmActionLink
-                                                            section={FarmActionSection.WITHDRAW}
-                                                            activeSection={actionSection}
-                                                            onClick={setActionSection}
-                                                        >
-                                                            Withdraw
-                                                        </FarmActionLink>
                                                         <FarmActionLink
                                                             section={FarmActionSection.HARVEST}
                                                             activeSection={actionSection}
@@ -473,90 +473,91 @@ const Farm: React.FC<{}> = () => {
                                                                             </div>
                                                                         </>
                                                                     )}
-                                                                {actionSection === FarmActionSection.WITHDRAW && (
-                                                                    <>
-                                                                        <h3>Withdrawal</h3>
+                                                                {actionSection === FarmActionSection.WITHDRAW &&
+                                                                    showStaking && (
+                                                                        <>
+                                                                            <h3>Withdrawal</h3>
 
-                                                                        <p>
-                                                                            Input the amount of tokens you want to
-                                                                            withdraw. Input amount must be bigger than
-                                                                            zero and equal or less than your staked
-                                                                            balance.
-                                                                        </p>
+                                                                            <p>
+                                                                                Input the amount of tokens you want to
+                                                                                withdraw. Input amount must be bigger
+                                                                                than zero and equal or less than your
+                                                                                staked balance.
+                                                                            </p>
 
-                                                                        {stakedAmount.isZero() && (
-                                                                            <Alert type={AlertType.WARNING}>
-                                                                                You have no available funds for
-                                                                                withdrawal.
-                                                                            </Alert>
-                                                                        )}
+                                                                            {stakedAmount.isZero() && (
+                                                                                <Alert type={AlertType.WARNING}>
+                                                                                    You have no available funds for
+                                                                                    withdrawal.
+                                                                                </Alert>
+                                                                            )}
 
-                                                                        <div className="form-group">
-                                                                            <label className="mb-0 font-weight-bold">
-                                                                                Staked amount
-                                                                            </label>
-                                                                            <span className="d-block">
-                                                                                {yourStakeDisplay} {farmToken}
-                                                                            </span>
-                                                                        </div>
+                                                                            <div className="form-group">
+                                                                                <label className="mb-0 font-weight-bold">
+                                                                                    Staked amount
+                                                                                </label>
+                                                                                <span className="d-block">
+                                                                                    {yourStakeDisplay} {farmToken}
+                                                                                </span>
+                                                                            </div>
 
-                                                                        <div className="form-group">
-                                                                            <form
-                                                                                className="form-inline"
-                                                                                onSubmit={(e) => {
-                                                                                    e.preventDefault();
-                                                                                    withdrawOnClickWithLoading();
-                                                                                }}
-                                                                            >
-                                                                                <div className="input-group">
-                                                                                    <input
-                                                                                        disabled={
-                                                                                            areWithdrawInputsDisabled
-                                                                                        }
-                                                                                        type="text"
-                                                                                        className="form-control"
-                                                                                        placeholder="amount to withdraw"
-                                                                                        aria-label="amount to withdraw"
-                                                                                        onChange={(e) =>
-                                                                                            setInputWithdrawAmount(
-                                                                                                e.target.value
-                                                                                            )
-                                                                                        }
-                                                                                        value={inputWithdrawAmount}
-                                                                                    />
-                                                                                    <div className="input-group-append">
-                                                                                        <ActionButton
-                                                                                            isLoading={
-                                                                                                isWithdrawLoading
-                                                                                            }
-                                                                                            isDisabled={
+                                                                            <div className="form-group">
+                                                                                <form
+                                                                                    className="form-inline"
+                                                                                    onSubmit={(e) => {
+                                                                                        e.preventDefault();
+                                                                                        withdrawOnClickWithLoading();
+                                                                                    }}
+                                                                                >
+                                                                                    <div className="input-group">
+                                                                                        <input
+                                                                                            disabled={
                                                                                                 areWithdrawInputsDisabled
                                                                                             }
-                                                                                            type="submit"
-                                                                                        >
-                                                                                            Withdraw
-                                                                                        </ActionButton>
+                                                                                            type="text"
+                                                                                            className="form-control"
+                                                                                            placeholder="amount to withdraw"
+                                                                                            aria-label="amount to withdraw"
+                                                                                            onChange={(e) =>
+                                                                                                setInputWithdrawAmount(
+                                                                                                    e.target.value
+                                                                                                )
+                                                                                            }
+                                                                                            value={inputWithdrawAmount}
+                                                                                        />
+                                                                                        <div className="input-group-append">
+                                                                                            <ActionButton
+                                                                                                isLoading={
+                                                                                                    isWithdrawLoading
+                                                                                                }
+                                                                                                isDisabled={
+                                                                                                    areWithdrawInputsDisabled
+                                                                                                }
+                                                                                                type="submit"
+                                                                                            >
+                                                                                                Withdraw
+                                                                                            </ActionButton>
+                                                                                        </div>
                                                                                     </div>
-                                                                                </div>
 
-                                                                                <div className="d-block w-100 d-lg-none" />
+                                                                                    <div className="d-block w-100 d-lg-none" />
 
-                                                                                <ActionButton
-                                                                                    isLoading={isWithdrawAllLoading}
-                                                                                    isDisabled={
-                                                                                        areWithdrawInputsDisabled
-                                                                                    }
-                                                                                    className="mt-3 mt-lg-0 ml-lg-3"
-                                                                                    onClick={
-                                                                                        withdrawAllOnClickWithLoading
-                                                                                    }
-                                                                                >
-                                                                                    Withdraw all
-                                                                                </ActionButton>
-                                                                            </form>
-                                                                        </div>
-                                                                    </>
-                                                                )}
+                                                                                    <ActionButton
+                                                                                        isLoading={isWithdrawAllLoading}
+                                                                                        isDisabled={
+                                                                                            areWithdrawInputsDisabled
+                                                                                        }
+                                                                                        className="mt-3 mt-lg-0 ml-lg-3"
+                                                                                        onClick={
+                                                                                            withdrawAllOnClickWithLoading
+                                                                                        }
+                                                                                    >
+                                                                                        Withdraw all
+                                                                                    </ActionButton>
+                                                                                </form>
+                                                                            </div>
+                                                                        </>
+                                                                    )}
                                                                 {actionSection === FarmActionSection.HARVEST && (
                                                                     <>
                                                                         <h3>Harvest</h3>
