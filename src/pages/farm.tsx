@@ -272,12 +272,14 @@ const Farm: React.FC<{}> = () => {
                                                         <span className="d-block">{yourDailyUpRewardDisplay} $UP</span>
                                                     </div>
 
-                                                    <div className="form-group">
-                                                        <label className="mb-0 font-weight-bold">APY %</label>
-                                                        <span className="d-block">
-                                                            {isApyLoading ? 'Loading...' : apyPercent.toFixed(2)}%
-                                                        </span>
-                                                    </div>
+                                                    {showStaking && (
+                                                        <div className="form-group">
+                                                            <label className="mb-0 font-weight-bold">APY %</label>
+                                                            <span className="d-block">
+                                                                {isApyLoading ? 'Loading...' : apyPercent.toFixed(2)}%
+                                                            </span>
+                                                        </div>
+                                                    )}
 
                                                     <div className="form-group">
                                                         <label className="mb-0 font-weight-bold">
