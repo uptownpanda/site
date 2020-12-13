@@ -2,16 +2,13 @@ import { useCallback, useContext, useEffect, useState } from 'react';
 import { Web3Context } from '../web3-context-provider';
 import useUpdateState from './useUpdateState';
 import BN from 'bn.js';
-import UptownPandaAbi from '../../contracts/UptownPandaAbi';
+import UptownPandaSwapAbi from '../../contracts/UptownPandaSwapAbi';
 import UptownPandaSwapTokenAbi from '../../contracts/UptownPandaSwapTokenAbi';
 import { Contract } from 'web3-eth-contract';
-import { MAX_UINT_256 } from '../../utils/numbers';
 
 interface ISwap {
     isLoading: boolean;
     isDataAvailable: boolean;
-    hasApproved: boolean;
-    uptownPandaAmount: BN;
     pendingSwapAmount: BN;
     isParticipating: boolean;
     needsApproval: boolean;
@@ -21,8 +18,6 @@ interface ISwap {
 const defaultSwap: ISwap = {
     isLoading: true,
     isDataAvailable: false,
-    hasApproved: false,
-    uptownPandaAmount: new BN(0),
     pendingSwapAmount: new BN(0),
     isParticipating: false,
     needsApproval: true,
@@ -37,60 +32,55 @@ const useSwap = () => {
     const [swap, setSwap] = useState<ISwap>(defaultSwap);
     const updateSwap = useUpdateState(setSwap);
 
-    const refreshData = useCallback(async (setIsLoading: boolean) => {
-        if (!contracts) {
-            return;
-        }
+    const refreshData = useCallback(
+        async (setIsLoading: boolean, setShowThankYou: boolean) => {
+            if (!contracts) {
+                return;
+            }
 
-        updateSwap({ isLoading: setIsLoading, isDataAvailable: true });
-        const [uptownPandaContract, swapTokenContract] = contracts;
+            updateSwap({ isLoading: setIsLoading, isDataAvailable: true });
+            const [swapContract, swapTokenContract] = contracts;
 
-        const uptownPandaAmount = new BN(await uptownPandaContract.methods.balanceOf(account).call());
-        const pendingSwapAmount = new BN(await swapTokenContract.methods.checkBalance(account).call());
-        if (uptownPandaAmount.isZero() && pendingSwapAmount.isZero()) {
-            updateSwap({ isLoading: false, isParticipating: false });
-            return;
-        }
+            const pendingSwapAmount = new BN(await swapTokenContract.methods.checkBalance(account).call());
+            if (pendingSwapAmount.isZero()) {
+                updateSwap({ isLoading: false, isParticipating: setShowThankYou, showThankYou: setShowThankYou });
+                return;
+            }
 
-        const approvedAmount = new BN(
-            await uptownPandaContract.methods
-                .allowance(account, process.env.NEXT_PUBLIC_SWAP_TOKEN_CONTRACT_ADDRESS)
-                .call()
-        );
-        const needsApproval = uptownPandaAmount.gt(approvedAmount);
-        const showThankYou = uptownPandaAmount.isZero() && !pendingSwapAmount.isZero();
-        updateSwap({
-            isLoading: false,
-            isParticipating: true,
-            uptownPandaAmount,
-            pendingSwapAmount,
-            needsApproval,
-            showThankYou,
-        });
-    }, [contracts, updateSwap]);
+            const needsApproval = await swapTokenContract.methods
+                .isApprovedForAll(account, swapContract.options.address)
+                .call();
+
+            updateSwap({
+                isLoading: false,
+                isParticipating: true,
+                pendingSwapAmount,
+                needsApproval,
+            });
+        },
+        [contracts, updateSwap]
+    );
 
     const onApproveClick = useCallback(async () => {
         if (!contracts) {
             return;
         }
-        const [uptownPandaContract, swapTokenContract] = contracts;
-        await uptownPandaContract.methods
-            .approve(swapTokenContract.options.address, MAX_UINT_256)
-            .send({ from: account });
-        await refreshData(false);
+        const [swapContract, swapTokenContract] = contracts;
+        await swapTokenContract.methods.setApprovalForAll(swapContract.options.address, true).send({ from: account });
+        await refreshData(false, false);
     }, [contracts, refreshData]);
 
     const onSwapClick = useCallback(async () => {
         if (!contracts) {
             return;
         }
-        const [uptownPandaContract, swapTokenContract] = contracts;
-        await swapTokenContract.methods.swap().send({ from: account });
-        await refreshData(false);
+        const swapContract = contracts[0];
+        await swapContract.methods.swap().send({ from: account });
+        await refreshData(false, true);
     }, [contracts, refreshData]);
 
     useEffect(() => {
-        refreshData(true);
+        refreshData(true, false);
     }, [refreshData]);
 
     useEffect(() => {
@@ -109,15 +99,12 @@ const useSwap = () => {
             return;
         }
 
-        const uptownPandaContract = new web3.eth.Contract(
-            UptownPandaAbi,
-            process.env.NEXT_PUBLIC_TOKEN_TO_SWAP_CONTRACT_ADDRESS
-        );
+        const swapContract = new web3.eth.Contract(UptownPandaSwapAbi, process.env.NEXT_PUBLIC_SWAP_CONTRACT_ADDRESS);
         const swapTokenContract = new web3.eth.Contract(
             UptownPandaSwapTokenAbi,
             process.env.NEXT_PUBLIC_SWAP_TOKEN_CONTRACT_ADDRESS
         );
-        setContracts([uptownPandaContract, swapTokenContract]);
+        setContracts([swapContract, swapTokenContract]);
     }, [web3, isWeb3ContextLoading, isEthProviderAvailable, isNetworkSupported, account, updateSwap, setContracts]);
 
     return { swap, onApproveClick, onSwapClick };

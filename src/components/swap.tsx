@@ -12,7 +12,6 @@ const Swap: React.FC = () => {
         isLoading,
         isDataAvailable,
         isParticipating,
-        uptownPandaAmount,
         pendingSwapAmount,
         needsApproval,
         showThankYou,
@@ -24,22 +23,16 @@ const Swap: React.FC = () => {
         onSwapClick
     );
 
-    const uptownPandaAmountDisplay = Web3.utils.fromWei(uptownPandaAmount);
     const pendingSwapAmountDisplay = Web3.utils.fromWei(pendingSwapAmount);
 
     return (
         <DataWrapper
             isLoading={isLoading}
             isDataAvailable={isDataAvailable}
-            connectWalletText="Connect your wallet to get the swap token."
+            connectWalletText="Connect your wallet to make the swap."
         >
             {isParticipating ? (
                 <>
-                    <div className="form-group">
-                        <label className="mb-0 font-weight-bold">Avaiable $UP amount</label>
-                        <span className="d-block">{uptownPandaAmountDisplay} $UP</span>
-                    </div>
-
                     <div className="form-group">
                         <label className="mb-0 font-weight-bold">Pending swap $UP amount</label>
                         <span className="d-block">{pendingSwapAmountDisplay} $UP</span>
@@ -49,7 +42,7 @@ const Swap: React.FC = () => {
                         <>
                             <p>
                                 Before swaping, you need to make an approval that enables swap contract to transfer your
-                                $UP tokens.
+                                ERC721 tokens and send ETH back to your wallet.
                             </p>
 
                             <ActionButton
@@ -62,11 +55,11 @@ const Swap: React.FC = () => {
                         </>
                     ) : showThankYou ? (
                         <Alert type={AlertType.SUCCESS} className="mb-0">
-                            You successfully completed the swap procedure.
+                            You successfully completed the swap procedure. Check your wallet for received ETHs.
                         </Alert>
                     ) : (
                         <>
-                            <p>Click on the button below to put your available $UP balance into swap process.</p>
+                            <p>Click on the button below to swap pending $UP tokens for ETHs.</p>
 
                             <ActionButton
                                 isLoading={isSwapLoading}
@@ -80,7 +73,7 @@ const Swap: React.FC = () => {
                 </>
             ) : (
                 <Alert type={AlertType.INFO} className="mb-0">
-                    You need $UP tokens to participate in the swap process.
+                    Only wallets containing swap ERC721 tokens can participate.
                 </Alert>
             )}
         </DataWrapper>
