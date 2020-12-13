@@ -47,9 +47,9 @@ const useSwap = () => {
                 return;
             }
 
-            const needsApproval = await swapTokenContract.methods
+            const needsApproval = !(await swapTokenContract.methods
                 .isApprovedForAll(account, swapContract.options.address)
-                .call();
+                .call());
 
             updateSwap({
                 isLoading: false,
