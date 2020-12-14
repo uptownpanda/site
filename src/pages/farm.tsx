@@ -1,6 +1,5 @@
 import Head from 'next/head';
 import { useContext, useState } from 'react';
-import FarmLink from '../components/farm-link';
 import { Farm as FarmType } from '../utils/enums';
 import Card from '../components/card';
 import Alert, { AlertType } from '../components/alert';
@@ -16,6 +15,7 @@ import useFarmActionButtons from '../components/hooks/useFarmActionButtons';
 import { Web3Context } from '../components/web3-context-provider';
 import BN from 'bn.js';
 import FarmSelection from '../components/farm-selection';
+import cn from 'classnames';
 
 export enum FarmActionSection {
     APPROVE = 'approve',
@@ -104,9 +104,7 @@ const Farm: React.FC<{}> = () => {
     const availableAmountForStakingDisplay = farmTokenValueDisplayer(activeFarm, availableAmountForStaking);
 
     const showStaking = account?.toLowerCase() === process.env.NEXT_PUBLIC_FARM_STAKING_ADDRESS?.toLowerCase();
-    const [actionSection, setActionSection] = useState<FarmActionSection>(
-        showStaking ? FarmActionSection.APPROVE : FarmActionSection.HARVEST
-    );
+    const [actionSection, setActionSection] = useState<FarmActionSection>(FarmActionSection.APPROVE);
 
     const {
         onApproveClick,
@@ -181,6 +179,9 @@ const Farm: React.FC<{}> = () => {
         onClaimClick
     );
 
+    const farmStatusClasses = cn('col-12 mb-4 col-sm-6', { 'mb-sm-0': !showStaking });
+    const yourFarmShareClasses = cn('col-12 col-sm-6', { 'mb-4': showStaking });
+
     return (
         <>
             <Head>
@@ -199,7 +200,7 @@ const Farm: React.FC<{}> = () => {
                         {isDataValid ? (
                             hasFarmingStarted ? (
                                 <>
-                                    <div className="col-12 mb-4 col-sm-6">
+                                    <div className={farmStatusClasses}>
                                         <Card titleIconClassName="fas fa-tractor" titleText="Farm status">
                                             <div className="form-group">
                                                 <label className="mb-0 font-weight-bold">Initial farm supply</label>
@@ -245,7 +246,7 @@ const Farm: React.FC<{}> = () => {
                                             </div>
                                         </Card>
                                     </div>
-                                    <div className="col-12 mb-4 col-sm-6">
+                                    <div className={yourFarmShareClasses}>
                                         <Card titleIconClassName="fas fa-user-circle" titleText="Your farm share">
                                             {!isAccountDataLoading ? (
                                                 <>
@@ -306,58 +307,54 @@ const Farm: React.FC<{}> = () => {
                                             )}
                                         </Card>
                                     </div>
-                                    <div className="col-12">
-                                        <Card titleIconClassName="fas fa-cogs" titleText="Actions">
-                                            <div className="row">
-                                                <div className="col-12 mb-4 col-sm-4 mb-sm-0 col-md-3">
-                                                    <ul className="list-group">
-                                                        {showStaking && (
-                                                            <>
-                                                                <FarmActionLink
-                                                                    section={FarmActionSection.APPROVE}
-                                                                    activeSection={actionSection}
-                                                                    onClick={setActionSection}
-                                                                >
-                                                                    Approve
-                                                                </FarmActionLink>
-                                                                <FarmActionLink
-                                                                    section={FarmActionSection.STAKE}
-                                                                    activeSection={actionSection}
-                                                                    onClick={setActionSection}
-                                                                >
-                                                                    Stake
-                                                                </FarmActionLink>
-                                                                <FarmActionLink
-                                                                    section={FarmActionSection.WITHDRAW}
-                                                                    activeSection={actionSection}
-                                                                    onClick={setActionSection}
-                                                                >
-                                                                    Withdraw
-                                                                </FarmActionLink>
-                                                            </>
-                                                        )}
-                                                        <FarmActionLink
-                                                            section={FarmActionSection.HARVEST}
-                                                            activeSection={actionSection}
-                                                            onClick={setActionSection}
-                                                        >
-                                                            Harvest
-                                                        </FarmActionLink>
-                                                        <FarmActionLink
-                                                            section={FarmActionSection.CLAIM}
-                                                            activeSection={actionSection}
-                                                            onClick={setActionSection}
-                                                        >
-                                                            Claim
-                                                        </FarmActionLink>
-                                                    </ul>
-                                                </div>
-                                                <div className="col-12 col-sm-8 col-md-9">
-                                                    {!isAccountDataLoading ? (
-                                                        isAccountConnected ? (
-                                                            <>
-                                                                {actionSection === FarmActionSection.APPROVE &&
-                                                                    showStaking && (
+                                    {showStaking && (
+                                        <div className="col-12">
+                                            <Card titleIconClassName="fas fa-cogs" titleText="Actions">
+                                                <div className="row">
+                                                    <div className="col-12 mb-4 col-sm-4 mb-sm-0 col-md-3">
+                                                        <ul className="list-group">
+                                                            <FarmActionLink
+                                                                section={FarmActionSection.APPROVE}
+                                                                activeSection={actionSection}
+                                                                onClick={setActionSection}
+                                                            >
+                                                                Approve
+                                                            </FarmActionLink>
+                                                            <FarmActionLink
+                                                                section={FarmActionSection.STAKE}
+                                                                activeSection={actionSection}
+                                                                onClick={setActionSection}
+                                                            >
+                                                                Stake
+                                                            </FarmActionLink>
+                                                            <FarmActionLink
+                                                                section={FarmActionSection.WITHDRAW}
+                                                                activeSection={actionSection}
+                                                                onClick={setActionSection}
+                                                            >
+                                                                Withdraw
+                                                            </FarmActionLink>
+                                                            <FarmActionLink
+                                                                section={FarmActionSection.HARVEST}
+                                                                activeSection={actionSection}
+                                                                onClick={setActionSection}
+                                                            >
+                                                                Harvest
+                                                            </FarmActionLink>
+                                                            <FarmActionLink
+                                                                section={FarmActionSection.CLAIM}
+                                                                activeSection={actionSection}
+                                                                onClick={setActionSection}
+                                                            >
+                                                                Claim
+                                                            </FarmActionLink>
+                                                        </ul>
+                                                    </div>
+                                                    <div className="col-12 col-sm-8 col-md-9">
+                                                        {!isAccountDataLoading ? (
+                                                            isAccountConnected ? (
+                                                                <>
+                                                                    {actionSection === FarmActionSection.APPROVE && (
                                                                         <>
                                                                             <h3>Approve</h3>
 
@@ -383,8 +380,7 @@ const Farm: React.FC<{}> = () => {
                                                                             </ActionButton>
                                                                         </>
                                                                     )}
-                                                                {actionSection === FarmActionSection.STAKE &&
-                                                                    showStaking && (
+                                                                    {actionSection === FarmActionSection.STAKE && (
                                                                         <>
                                                                             <h3>Stake</h3>
 
@@ -475,8 +471,7 @@ const Farm: React.FC<{}> = () => {
                                                                             </div>
                                                                         </>
                                                                     )}
-                                                                {actionSection === FarmActionSection.WITHDRAW &&
-                                                                    showStaking && (
+                                                                    {actionSection === FarmActionSection.WITHDRAW && (
                                                                         <>
                                                                             <h3>Withdrawal</h3>
 
@@ -560,81 +555,83 @@ const Farm: React.FC<{}> = () => {
                                                                             </div>
                                                                         </>
                                                                     )}
-                                                                {actionSection === FarmActionSection.HARVEST && (
-                                                                    <>
-                                                                        <h3>Harvest</h3>
+                                                                    {actionSection === FarmActionSection.HARVEST && (
+                                                                        <>
+                                                                            <h3>Harvest</h3>
 
-                                                                        <p>
-                                                                            To harvest the reward and later on be able
-                                                                            to claim it, click on the button below.
-                                                                        </p>
+                                                                            <p>
+                                                                                To harvest the reward and later on be
+                                                                                able to claim it, click on the button
+                                                                                below.
+                                                                            </p>
 
-                                                                        <div className="form-group">
-                                                                            <label className="mb-0 font-weight-bold">
-                                                                                Harvestable reward
-                                                                            </label>
-                                                                            <span className="d-block">
-                                                                                {harvestableRewardDisplay} $UP
-                                                                            </span>
-                                                                        </div>
+                                                                            <div className="form-group">
+                                                                                <label className="mb-0 font-weight-bold">
+                                                                                    Harvestable reward
+                                                                                </label>
+                                                                                <span className="d-block">
+                                                                                    {harvestableRewardDisplay} $UP
+                                                                                </span>
+                                                                            </div>
 
-                                                                        <ActionButton
-                                                                            isLoading={isHarvestLoading}
-                                                                            onClick={harvestOnClickWithLoading}
-                                                                            isDisabled={isHarvestDisabled}
-                                                                        >
-                                                                            Harvest
-                                                                        </ActionButton>
-                                                                    </>
-                                                                )}
-                                                                {actionSection === FarmActionSection.CLAIM && (
-                                                                    <>
-                                                                        <h3>Claim</h3>
+                                                                            <ActionButton
+                                                                                isLoading={isHarvestLoading}
+                                                                                onClick={harvestOnClickWithLoading}
+                                                                                isDisabled={isHarvestDisabled}
+                                                                            >
+                                                                                Harvest
+                                                                            </ActionButton>
+                                                                        </>
+                                                                    )}
+                                                                    {actionSection === FarmActionSection.CLAIM && (
+                                                                        <>
+                                                                            <h3>Claim</h3>
 
-                                                                        <p>
-                                                                            Once the reward is harvested, you will be
-                                                                            able to claim it in parts. Every day 10% of
-                                                                            the harvested reward will be released for
-                                                                            claiming. After one day 10% is claimable,
-                                                                            after two days 20% is claimable, and so
-                                                                            on...
-                                                                        </p>
+                                                                            <p>
+                                                                                Once the reward is harvested, you will
+                                                                                be able to claim it in parts. Every day
+                                                                                10% of the harvested reward will be
+                                                                                released for claiming. After one day 10%
+                                                                                is claimable, after two days 20% is
+                                                                                claimable, and so on...
+                                                                            </p>
 
-                                                                        <div className="form-group">
-                                                                            <label className="mb-0 font-weight-bold">
-                                                                                Claimable / total harvested reward
-                                                                            </label>
-                                                                            <span className="d-block">
-                                                                                {claimableHarvestedRewardDisplay} /{' '}
-                                                                                {totalHarvestedRewardDisplay} $UP
-                                                                            </span>
-                                                                        </div>
+                                                                            <div className="form-group">
+                                                                                <label className="mb-0 font-weight-bold">
+                                                                                    Claimable / total harvested reward
+                                                                                </label>
+                                                                                <span className="d-block">
+                                                                                    {claimableHarvestedRewardDisplay} /{' '}
+                                                                                    {totalHarvestedRewardDisplay} $UP
+                                                                                </span>
+                                                                            </div>
 
-                                                                        <ActionButton
-                                                                            isLoading={isClaimLoading}
-                                                                            onClick={claimOnClickWithLoading}
-                                                                            isDisabled={isClaimDisabled}
-                                                                        >
-                                                                            Claim
-                                                                        </ActionButton>
-                                                                    </>
-                                                                )}
-                                                            </>
+                                                                            <ActionButton
+                                                                                isLoading={isClaimLoading}
+                                                                                onClick={claimOnClickWithLoading}
+                                                                                isDisabled={isClaimDisabled}
+                                                                            >
+                                                                                Claim
+                                                                            </ActionButton>
+                                                                        </>
+                                                                    )}
+                                                                </>
+                                                            ) : (
+                                                                <Alert type={AlertType.WARNING}>
+                                                                    Connect your account to start farming!
+                                                                </Alert>
+                                                            )
                                                         ) : (
-                                                            <Alert type={AlertType.WARNING}>
-                                                                Connect your account to start farming!
-                                                            </Alert>
-                                                        )
-                                                    ) : (
-                                                        <ComponentLoader
-                                                            color={ComponentLoaderColor.SUCCESS}
-                                                            className="py-3"
-                                                        />
-                                                    )}
+                                                            <ComponentLoader
+                                                                color={ComponentLoaderColor.SUCCESS}
+                                                                className="py-3"
+                                                            />
+                                                        )}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </Card>
-                                    </div>
+                                            </Card>
+                                        </div>
+                                    )}
                                 </>
                             ) : (
                                 <div className="col">
