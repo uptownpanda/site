@@ -23,7 +23,8 @@ const HarvestChunkTableRow: React.FC<HarvestChunkTableRowProps> = ({
     const { timestamp, amount, isLoadingClaimed, claimed } = harvestChunk;
     const isShowDetailsDisabled = loadingClaimsHarvestChunkIndex !== null;
     const showDetailsLoading = harvestChunkIndex === loadingClaimsHarvestChunkIndex;
-    const claimablePercent = Math.floor((Date.now() / 1000 - timestamp) / harvestInterval) * harvestStepPercent;
+    const claimablePercent =
+        Math.min(Math.floor((Date.now() / 1000 - timestamp) / harvestInterval), 10) * harvestStepPercent;
     const claimableAmount = amount.mul(new BN(claimablePercent)).div(new BN(100));
     const claimedPercent = !isLoadingClaimed
         ? Math.round((Number(Web3.utils.fromWei(claimed)) * 100) / Number(Web3.utils.fromWei(amount)))
